@@ -1,0 +1,21 @@
+[[redirects]]
+  from = "/*"
+  to = "/"
+  status = 200
+[[redirects]]
+  from = "/oc_analyze"
+  to = "/oc_analyze"
+  status = 200
+[[redirects]]
+  from = "/uptrend"
+  to = "/uptrend"
+  status = 200
+[[redirects]]
+  from = "/*"
+  to = "/"
+  status = 200
+[[redirects]]
+  from = "/option_chain_table"
+  to = "/option_chain_table"
+  status = 200
+  

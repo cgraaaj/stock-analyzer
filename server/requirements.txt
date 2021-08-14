@@ -1,0 +1,10 @@
+flask_cors
+flask
+pandas
+numpy
+openpyxl
+waitress
+pymongo
+pymongo[srv]
+python-dotenv
+requests

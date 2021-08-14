@@ -1,0 +1,15 @@
+# pull official base image
+FROM node:alpine
+
+# set working directory
+USER node
+RUN mkdir -p /home/node/app
+WORKDIR /home/node/app
+
+# install app dependencies
+COPY --chown=node:node ./package.json ./
+RUN npm install
+COPY --chown=node:node ./ ./
+
+# start app
+CMD ["npm", "start"]
