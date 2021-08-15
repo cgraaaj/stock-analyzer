@@ -11,6 +11,7 @@ db = get_database()
 
 @analyze.route('/option-chain', methods = ['POST'])
 def option_chain():
+    print(request.args.get('expiry'))
     expiry = request.args.get('expiry')
     current_app.logger.info(f'analyzing data')
     df = analyze_stock(expiry,request.json)

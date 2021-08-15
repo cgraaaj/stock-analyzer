@@ -1,6 +1,6 @@
 {
   "name": "stock-analyzer",
-  "homepage": "/dev",
+  "homepage": "/stock-analyzer",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

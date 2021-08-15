@@ -1,3 +1,3 @@
 import { createBrowserHistory } from "history";
 
-export default createBrowserHistory({basename: 'dev'});
+export default createBrowserHistory({basename: 'stock-analyzer'});

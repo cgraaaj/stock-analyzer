@@ -1,5 +1,5 @@
 import history from "../history";
-// import { API } from "../utils/api";
+import { API } from "../utils/api";
 import axios from "axios";
 import {
   FETCH_DATA,
@@ -20,7 +20,7 @@ export const fetchData = (index, symbol) => async (dispatch) => {
   let response = "";
   console.log(index, symbol)
   try {
-    response = await axios.get('/api/nse/option-chain', {
+    response = await API.get('/api/nse/option-chain', {
       params: {
         index,
         symbol
@@ -48,7 +48,7 @@ export const reset = () => {
 export const changeMode = (mode) => async (dispatch) => {
   let response = "";
   if (mode !== 'INDEX') {
-    response = await axios.get('/api/nse/equities')
+    response = await API.get('/api/nse/equities')
     console.log(response.data)
     response = response.data
   }
@@ -81,7 +81,7 @@ export const getOptionChain = (expiry, data) => async (dispatch) => {
   let response = "";
   console.log(expiry, data)
   try {
-    response = await axios.post(`/api/analyze/option-chain`, data, {
+    response = await API.post(`/api/analyze/option-chain`, data, {
       params: {
         expiry
       }
@@ -102,7 +102,7 @@ export const downloadData = (index,expiry, data) => async (dispatch) => {
   let response = "";
   console.log(index, data)
   try {
-    response = await axios.post(`/api/analyze/download/${index}`, data,{
+    response = await API.post(`/api/analyze/download/${index}`, data,{
       params: {
         expiry
       }
@@ -129,7 +129,7 @@ export const setFormValues = (formValues) => {
 export const getUptrend = () => async (dispatch) => {
   let response = "";
   try {
-    response = await axios.get(`/api/analyze/uptrend`)
+    response = await API.get(`/api/analyze/uptrend`)
     response = response.data
     console.log(response)
   } catch (err) {

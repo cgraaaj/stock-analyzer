@@ -25,7 +25,7 @@ def oi_action_pe(row):
         return "Long Unwind"
 
 
-def analyze_stock(expiry,data):
+def analyze_stock(expiry, data):
     data_path = os.path.dirname(os.path.realpath(__file__))
     expiry_data = {}
     df_ce_pe = pd.DataFrame()
@@ -49,8 +49,8 @@ def analyze_stock(expiry,data):
         expiry_data[expiry_dt] = [
             d for d in data["data"] if expiry_dt in d["expiryDate"]
         ]
-    ce = [expd.get('CE') for expd in expiry_data[expiry] if "CE" in expd.keys()]
-    pe = [expd.get["PE"] for expd in expiry_data[expiry] if "PE" in expd.keys()]
+    ce = [expd.get("CE") for expd in expiry_data[expiry] if "CE" in expd.keys()]
+    pe = [expd.get("PE") for expd in expiry_data[expiry] if "PE" in expd.keys()]
     df_ce = pd.DataFrame(ce)[
         [
             "openInterest",

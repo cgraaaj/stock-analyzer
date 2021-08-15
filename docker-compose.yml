@@ -20,8 +20,7 @@ services:
     depends_on:
       - api
     environment: 
-      - REACT_APP_API=nginx
-      - REACT_APP_PUBLIC_URL=nginx
+      - REACT_APP_API=stock-analyzer
   api:
     build:
       dockerfile: Dockerfile.dev

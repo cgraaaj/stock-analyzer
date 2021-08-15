@@ -7,7 +7,7 @@ import { setModal } from "../../actions";
 import Chart from "../BarCharts/Chart";
 import Modal from "../Modal";
 import axios from "axios";
-// import { API } from "../../utils/api";
+import { API } from "../../utils/api";
 
 class OptionChain extends React.Component {
   renderChart = (data) => {
@@ -43,7 +43,9 @@ class OptionChain extends React.Component {
     OCTableData["data"] = this.props.OCTable;
     console.log(OCTableData);
     sessionStorage.setItem("tableData", JSON.stringify(OCTableData));
-    window.open("/option_chain_table", "_blank");
+    // let subDomain = /:\/\/([^\/]+)/.exec(window.location.href)[0];
+    // console.log(window.location.pathname)
+    window.open(`/stock-analyzer/option_chain_table`, "_blank");
   };
 
   onClickChart = (data) => (e) => {
@@ -58,7 +60,7 @@ class OptionChain extends React.Component {
   downloadData = async (index, data) => {
     let response = "";
     try {
-      response = await axios.post(`/api/analyze/download/${index}`, data, {
+      response = await API.post(`/api/analyze/download/${index}`, data, {
         params: { expiry: this.props.selectedExpiry },
         responseType: "blob",
       });
