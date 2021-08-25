@@ -14,6 +14,7 @@ const App = () => {
   return (
     <div className="ui container">
       <Router history={history} basename={"/stock-analyzer"}>
+      {/* <Router history={history}> */}
         <div>
           <Header />
           <Route path={`/`} exact component={Home}></Route>
