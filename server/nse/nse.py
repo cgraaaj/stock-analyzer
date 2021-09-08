@@ -18,7 +18,7 @@ def get_option_chain():
 @nse.route("/equities")
 def get_equities():
     res = get_nse_response(equities_url)
-    return res
+    return jsonify(res)
 
 def get_nse_response(url):
         headers = {

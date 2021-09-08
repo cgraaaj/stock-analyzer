@@ -1,6 +1,6 @@
 version: '3.7'
 services:
-  nginx:
+  nginx_dev:
     restart: always
     build:
       dockerfile: Dockerfile.dev
@@ -8,9 +8,9 @@ services:
     ports:
       - '3051:80'
     depends_on:
-      - api
-      - client
-  client:
+      - api_dev
+      - client_dev
+  client_dev:
     build:
       dockerfile: Dockerfile.dev
       context: ./client
@@ -18,8 +18,8 @@ services:
       - /home/node/app/node_modules
       - ./client:/home/node/app
     depends_on:
-      - api
-  api:
+      - api_dev
+  api_dev:
     build:
       dockerfile: Dockerfile.dev
       context: ./server
