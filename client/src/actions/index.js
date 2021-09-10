@@ -13,7 +13,9 @@ import {
   UPTREND,
   CHANGE_OPTION,
   CHANGE_DATE,
-  RESET
+  RESET,
+  OPTION_TREND,
+  GET_OPTION_VALUES
 } from "./types";
 
 export const fetchData = (index, symbol) => async (dispatch) => {
@@ -155,5 +157,28 @@ export const changeDate = (date) => {
     type: CHANGE_DATE,
     payload: date
   }
+}
+
+export const checkOptionTrend = (value) =>{
+  return {
+    type: OPTION_TREND,
+    payload:value
+  }
+}
+
+export const getOptionValues = () => async (dispatch) => {
+  let response = "";
+  try {
+    response = await API.get(`/api/analyze/options`)
+    response = response.data
+    console.log(response)
+  } catch (err) {
+    console.log(err)
+    response = err.response;
+  }
+  dispatch({
+    type: GET_OPTION_VALUES,
+    payload: response,
+  });
 }
 

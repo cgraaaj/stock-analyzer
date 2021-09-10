@@ -5,6 +5,8 @@ from flask_cors import CORS
 from waitress import serve
 import os
 import logging
+import csv
+import time
 
 # from bson import json_util
 from dotenv import load_dotenv
@@ -19,9 +21,11 @@ app.register_blueprint(nse, url_prefix="/nse")
 app.register_blueprint(analyze, url_prefix="/analyze")
 
 # logging
-logging.basicConfig(filename='server.log',
-level=logging.DEBUG,
-format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
+logging.basicConfig(
+    filename="server.log",
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s",
+)
 
 # cors
 cors = CORS(app)
@@ -33,6 +37,17 @@ app.config["CORS_HEADERS"] = "Content-Type"
 @app.route("/hi", methods=["GET"])
 def hi():
     return "hi"
+
+@app.route('/test.csv')
+def generate_large_csv():
+    def generate():
+        filename = 'test.csv'
+        with open(filename, 'r') as csvfile:
+            datareader = csv.reader(csvfile)
+            for row in datareader:
+                time.sleep(1)
+                yield f"{','.join(row)}\n"
+    return app.response_class(generate(), mimetype='text/csv')
 
 
 # main driver function

@@ -12,9 +12,6 @@ services:
   client:
     build:
       context: ./client
-    volumes:
-      - /home/node/app/node_modules
-      - ./client:/home/node/app
     depends_on:
       - api
     restart: always

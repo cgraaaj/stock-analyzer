@@ -71,7 +71,7 @@ class Home extends React.Component {
             className="ui button"
             onClick={() => {
               if (input.value === "INDEX") {
-                this.props.changeMode("STOCK");
+                this.props.changeMode("EQUITY");
               } else {
                 this.props.changeMode("INDEX");
               }

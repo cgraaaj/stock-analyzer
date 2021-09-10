@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import _ from "lodash"
 
-import { getUptrend, changeOption, changeDate } from "../actions";
+import { getUptrend, changeOption, changeDate } from "../../actions";
 
 class OptionChain extends React.Component {
     componentDidMount() {
@@ -29,7 +29,7 @@ class OptionChain extends React.Component {
         )
     }
     render() {
-        return (<div className="ui container">
+        return (
             <div className="ui segment">
                 <div className="ui grid">
                     <div className="four column centered row">
@@ -117,7 +117,7 @@ class OptionChain extends React.Component {
                         </div>
                     </div>}
             </div>
-        </div>)
+        )
     }
 }
 

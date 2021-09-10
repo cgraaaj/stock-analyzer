@@ -16,3 +16,6 @@ export const CHANGE_OPTION = "CHANGE_OPTION";
 export const CHANGE_DATE = "CHANGE_DATE";
 export const RESET = "RESET";
 
+export const OPTION_TREND= "OPTION_TREND";
+export const GET_OPTION_VALUES = "GET_OPTION_VALUES";
+
