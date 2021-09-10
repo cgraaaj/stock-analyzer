@@ -24,10 +24,10 @@ class OptionTrend:
             temp={}
             temp['name']= symbol
             temp['options']={"calls":{"bullish":0,"bearish":0},"puts":{"bullish":0,"bearish":0}}
-            temp['options']['calls']['bullish'] = sum(1 for trend in resp['Call Trend'].tolist() if trend == 'Bullish')
-            temp['options']['calls']['bearish'] = sum(1 for trend in resp['Call Trend'].tolist() if trend == 'Bearish')
-            temp['options']['puts']['bullish'] = sum(1 for trend in resp['Put Trend'].tolist() if trend == 'Bullish')
-            temp['options']['puts']['bearish'] = sum(1 for trend in resp['Put Trend'].tolist() if trend == 'Bearish')
+            temp['options']['calls']['bullish'] = len(resp[resp['Call Trend'] == "Bullish"])
+            temp['options']['calls']['bearish'] = len(resp[resp['Call Trend'] == "Bearish"])
+            temp['options']['puts']['bullish'] = len(resp[resp['Put Trend'] == "Bullish"])
+            temp['options']['puts']['bearish'] = len(resp[resp['Put Trend'] == "Bearish"])
             temp['callTrend'] = True if temp['options']['calls']['bullish'] > temp['options']['calls']['bearish'] else False
             temp['putTrend'] = True if temp['options']['puts']['bullish'] > temp['options']['puts']['bearish'] else False
             self.result.append(temp)
@@ -44,9 +44,9 @@ class OptionTrend:
         # pool.starmap(func, [(1, 1), (2, 1), (3, 1)])
         # pool.starmap(func, zip(a_args, repeat(second_arg)))
         # pool.map(partial(func, b=second_arg), a_args)
-        print(self.result)
-        print([ticker['name'] for ticker in self.result if ticker['callTrend']])
-        print([ticker['name'] for ticker in self.result if ticker['putTrend']])
+        # print(self.result)
+        # print([ticker['name'] for ticker in self.result if ticker['callTrend']])
+        # print([ticker['name'] for ticker in self.result if ticker['putTrend']])
         return self.result
 
 # get_option_trend("equities")

@@ -9,7 +9,7 @@ const INTIAL_STATE = {
     uptrend: undefined,
     uptrendWithVolume: undefined,
     optionTrend: false,
-    options: {call:[],put:[]}
+    options: []
 };
 
 const setUptrendData = (data, dateObj, option) => {
@@ -42,11 +42,12 @@ const uptrendReducer = (state = INTIAL_STATE, action) => {
             return { ...state, optionTrend: action.payload }
         }
         case GET_OPTION_VALUES: 
-            let call = action.payload.filter(option=>option.callTrend)
-            console.log(call.length)
-            let put = action.payload.filter(option=>option.putTrend)
-            console.log(put.length)
-            return { ...state, options:{call,put}}
+            let options =  action.payload.map(option=> {
+            let callTrenddDiff = option.options.calls.bullish-option.options.calls.bearish
+            let putTrendDiff = option.options.puts.bullish-option.options.puts.bearish
+            return {...option,callTrenddDiff,putTrendDiff}
+        })
+            return { ...state, options}
         default:
             return state
     }
