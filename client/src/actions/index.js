@@ -15,8 +15,10 @@ import {
   CHANGE_DATE,
   RESET,
   OPTION_TREND,
-  GET_OPTION_VALUES
+  GET_OPTION_VALUES,
+  SET_PROGRESS
 } from "./types";
+import _ from "lodash";
 
 export const fetchData = (index, symbol) => async (dispatch) => {
   let response = "";
@@ -42,8 +44,8 @@ export const fetchData = (index, symbol) => async (dispatch) => {
 
 export const reset = () => {
   return {
-    type:RESET,
-    payload:{}
+    type: RESET,
+    payload: {}
   }
 }
 
@@ -100,11 +102,11 @@ export const getOptionChain = (expiry, data) => async (dispatch) => {
   });
 };
 
-export const downloadData = (index,expiry, data) => async (dispatch) => {
+export const downloadData = (index, expiry, data) => async (dispatch) => {
   let response = "";
   console.log(index, data)
   try {
-    response = await API.post(`/api/analyze/download/${index}`, data,{
+    response = await API.post(`/api/analyze/download/${index}`, data, {
       params: {
         expiry
       }
@@ -159,26 +161,53 @@ export const changeDate = (date) => {
   }
 }
 
-export const checkOptionTrend = (value) =>{
+export const checkOptionTrend = (value) => {
   return {
     type: OPTION_TREND,
-    payload:value
+    payload: value
   }
+}
+
+function IsJsonString(str) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
 }
 
 export const getOptionValues = () => async (dispatch) => {
   let response = "";
   try {
-    response = await API.get(`/api/analyze/options`)
-    response = response.data
-    console.log(response)
+    let contentLength = await API.get(`/api/analyze/getContentLength`)
+    response = await API.get(`/api/analyze/options`, {
+      onDownloadProgress: progressEvent => {
+        const chunk = progressEvent.currentTarget.response;
+        let res = []
+        chunk.split('\n').forEach(obj => IsJsonString(obj) ? res.push(JSON.parse(obj)) : {})
+        let percentCompleted = Math.floor(progressEvent.loaded / parseInt(contentLength.data) * 100)
+        console.log('completed: ', percentCompleted)
+        dispatch({
+          type: GET_OPTION_VALUES,
+          payload: _.compact(res),
+        });
+        dispatch({
+          type: SET_PROGRESS,
+          payload: { progress: percentCompleted,isProgressing:true, isComplete: false },
+        });
+      }
+    })
+    // response = response.data
+    // console.log(response)
   } catch (err) {
     console.log(err)
     response = err.response;
   }
   dispatch({
-    type: GET_OPTION_VALUES,
-    payload: response,
+    type: SET_PROGRESS,
+    payload: { progress: 100,isProgressing:false, isComplete: true },
   });
+  console.log("Final over")
 }
 

@@ -18,4 +18,5 @@ export const RESET = "RESET";
 
 export const OPTION_TREND= "OPTION_TREND";
 export const GET_OPTION_VALUES = "GET_OPTION_VALUES";
+export const SET_PROGRESS= "SET_PROGRESS"
 
