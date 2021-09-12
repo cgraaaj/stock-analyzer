@@ -6,8 +6,20 @@ import { getOptionValues } from "../../actions";
 
 class OptionUptrend extends React.Component {
 
+
     componentDidMount() {
         this.props.getOptionValues()
+        window.addEventListener("beforeunload", this.handleWindowBeforeUnload);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("beforeunload", this.handleWindowBeforeUnload);
+    }
+
+    handleWindowBeforeUnload = (ev) => {
+        ev.preventDefault();
+        const confirmationMessage = "Do you want to cancel the request"
+        ev.returnValue = confirmationMessage
     }
 
     populateRows = (options, header) => {
@@ -31,11 +43,11 @@ class OptionUptrend extends React.Component {
             {/* <div>
                 <iframe src={"http://localhost:3051/stock-analyzer/stock-analyzer/api/analyze/options"} height={500} width={500} />
             </div> */}
-            <div className={this.props.progressBar.isComplete?`ui active progress success`:`ui active progress`} data-percent={this.props.progressBar.progress}>
-                <div className="bar" style={{width:`${this.props.progressBar.progress}%`,transitionDuration:"5000ms"}}>
+            <div className={this.props.progressBar.isComplete ? `ui active progress success` : `ui active progress`} data-percent={this.props.progressBar.progress}>
+                <div className="bar" style={{ width: `${this.props.progressBar.progress}%`, transitionDuration: "5000ms" }}>
                     <div className="progress">{`${this.props.progressBar.progress}%`}</div>
                 </div>
-                <div className="label">{this.props.progressBar.isComplete?"Its done":"Analyzing Options"}</div>
+                <div className="label">{this.props.progressBar.isComplete ? "Its done" : "Analyzing Options"}</div>
             </div>
             <div className="ui two column doubling grid container">
                 <div className="column">
