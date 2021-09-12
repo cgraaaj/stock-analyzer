@@ -1,93 +1,171 @@
 import React from "react";
 import { connect } from "react-redux";
-import _ from "lodash"
+import _ from "lodash";
 
 import { getOptionValues } from "../../actions";
 
 class OptionUptrend extends React.Component {
-
-
     componentDidMount() {
-        this.props.getOptionValues()
+        if(_.isEmpty(this.props.options)){
+        this.props.getOptionValues();
+        }
         window.addEventListener("beforeunload", this.handleWindowBeforeUnload);
+        this.unmountProgressBar()
     }
 
     componentWillUnmount() {
         window.removeEventListener("beforeunload", this.handleWindowBeforeUnload);
     }
 
-    handleWindowBeforeUnload = (ev) => {
-        ev.preventDefault();
-        const confirmationMessage = "Do you want to cancel the request"
-        ev.returnValue = confirmationMessage
+    componentDidUpdate(){
+        this.unmountProgressBar()
+    }
+    unmountProgressBar(){
+        if (this.props.progressBar.isComplete && document.getElementById("progressBar")) {
+            console.log("asdf")
+            setTimeout(() => {
+                document.getElementById("progressBar").remove();
+            }, 3000)
+        }
     }
 
-    populateRows = (options, header) => {
-        options = header === "Call" ? options.sort((a, b) => a.callTrendDiff > b.callTrendDiff ? -1 : 1)
-            : options.sort((a, b) => a.putTrendDiff > b.putTrendDiff ? -1 : 1)
-        let greenIndex = 100 / options.length
-        return options.map((option, i) =>
-            <tr style={{ backgroundColor: `rgb(0,${greenIndex * (i + 1) + 100},0)` }} key={i}>
+    handleWindowBeforeUnload = (ev) => {
+        ev.preventDefault();
+        const confirmationMessage = "Do you want to cancel the request";
+        ev.returnValue = confirmationMessage;
+    };
+    //table rows populate
+    populateRow = (options, header) => {
+        options =
+            header === "Call"
+                ? options.sort((a, b) => (a.callTrendDiff > b.callTrendDiff ? -1 : 1))
+                : options.sort((a, b) => (a.putTrendDiff > b.putTrendDiff ? -1 : 1));
+        let greenIndex = 100 / options.length;
+        return options.map((option, i) => (
+            <tr
+                style={{ backgroundColor: `rgb(0,${greenIndex * (i + 1) + 100},0)` }}
+                key={i}
+            >
                 <td
-                    data-tooltip={header === "Call" ? `Bullish:${option.options.calls.bullish} Bearish:${option.options.calls.bearish} ` : `Bullish:${option.options.puts.bullish} Bearish:${option.options.puts.bearish}`}
+                    style={{ color: "white" }}
+                    data-tooltip={
+                        header === "Call"
+                            ? `Bullish:${option.options.calls.bullish} Bearish:${option.options.calls.bearish} `
+                            : `Bullish:${option.options.puts.bullish} Bearish:${option.options.puts.bearish}`
+                    }
                     data-position="top right"
-                    data-label={header}>
+                    data-label={header}
+                >
                     {option.name}
                 </td>
             </tr>
-        )
-    }
+        ));
+    };
+
+    populateGridRow = (options, header) => {
+        options = options.filter((option) =>
+            header === "Call" ? option.callTrend : option.putTrend
+        );
+        options =
+            header === "Call"
+                ? options.sort((a, b) => (a.callTrendDiff > b.callTrendDiff ? -1 : 1))
+                : options.sort((a, b) => (a.putTrendDiff > b.putTrendDiff ? -1 : 1));
+        let greenIndex = 100 / options.length;
+        return options.map((option, i) => (
+            <div
+                style={{
+                    color: "white",
+                    backgroundColor: `rgb(0,${greenIndex * (i + 1) + 100},0)`,
+                }}
+                key={i}
+                data-tooltip={
+                    header === "Call"
+                        ? `Bullish:${option.options.calls.bullish} Bearish:${option.options.calls.bearish} `
+                        : `Bullish:${option.options.puts.bullish} Bearish:${option.options.puts.bearish}`
+                }
+                data-position="top right"
+                data-label={header}
+                className="column"
+            >
+                <div className="row">{option.name}</div>
+                <div className="row">value%</div>
+            </div>
+        ));
+    };
+
+    populateOption = (options, header) => {
+        return (
+            <div className="ui segment">
+                <div className="ui one column grid container">
+                    <div className="row">
+                        <div className="ui grid">
+                            <div className="left floated column">{header}</div>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="ui container">
+                            {_.isEmpty(options) ? (
+                                <div className="ui active inverted dimmer">
+                                    <div className="ui text loader">Loading</div>
+                                </div>
+                            ) : (
+                                <div className="ui eight column doubling grid">
+                                    {this.populateGridRow(options, header)}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
 
     render() {
-        return (<div className="ui segment">
-            {/* <div>
-                <iframe src={"http://localhost:3051/stock-analyzer/stock-analyzer/api/analyze/options"} height={500} width={500} />
-            </div> */}
-            <div className={this.props.progressBar.isComplete ? `ui active progress success` : `ui active progress`} data-percent={this.props.progressBar.progress}>
-                <div className="bar" style={{ width: `${this.props.progressBar.progress}%`, transitionDuration: "5000ms" }}>
-                    <div className="progress">{`${this.props.progressBar.progress}%`}</div>
+        return (
+            <div className="ui segments">
+                {_.isEmpty(this.props.options) ? null: 
+                <div id="progressBar" className="ui segment">
+                    <div
+                        className={
+                            this.props.progressBar.isComplete
+                                ? `ui active progress success`
+                                : `ui active progress`
+                        }
+                        data-percent={this.props.progressBar.progress}
+                    >
+                        <div
+                            className="bar"
+                            style={{
+                                width: `${this.props.progressBar.progress}%`,
+                                transitionDuration: "1000ms",
+                            }}
+                        >
+                            <div className="progress">{`${this.props.progressBar.progress}%`}</div>
+                        </div>
+                        <div className="label">
+                            {this.props.progressBar.isComplete
+                                ? "Its done"
+                                : "Analyzing Options"}
+                        </div>
+                    </div>
                 </div>
-                <div className="label">{this.props.progressBar.isComplete ? "Its done" : "Analyzing Options"}</div>
+                }
+                <div className="ui segment">
+                    <div className="ui segments">
+                        {this.populateOption(this.props.options, "Call")}
+                        {this.populateOption(this.props.options, "Put")}
+                    </div>
+                </div>
             </div>
-            <div className="ui two column doubling grid container">
-                <div className="column">
-                    <table className="ui celled table">
-                        <thead>
-                            <tr>
-                                <th>Call</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {this.populateRows(this.props.options.filter(option => option.callTrend), "Call")}
-                        </tbody>
-                    </table>
-                </div>
-                <div className="column">
-                    <table className="ui celled table">
-                        <thead>
-                            <tr>
-                                <th>Put</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {this.populateRows(this.props.options.filter(option => option.putTrend), "Put")}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>)
+        );
     }
 }
 
 const mapStateToProps = (state) => {
-
     return {
-        optionTrend: state.uptrend.optionTrend,
         options: state.uptrend.options,
-        progressBar: state.uptrend.progressBar
-    }
+        progressBar: state.uptrend.progressBar,
+    };
 };
 
 export default connect(mapStateToProps, { getOptionValues })(OptionUptrend);
-

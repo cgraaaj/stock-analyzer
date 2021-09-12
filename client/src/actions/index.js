@@ -14,9 +14,9 @@ import {
   CHANGE_OPTION,
   CHANGE_DATE,
   RESET,
-  OPTION_TREND,
+  EQUITY_TREND,
   GET_OPTION_VALUES,
-  SET_PROGRESS
+  SET_PROGRESS,
 } from "./types";
 import _ from "lodash";
 
@@ -163,7 +163,7 @@ export const changeDate = (date) => {
 
 export const checkOptionTrend = (value) => {
   return {
-    type: OPTION_TREND,
+    type: EQUITY_TREND,
     payload: value
   }
 }
@@ -210,4 +210,3 @@ export const getOptionValues = () => async (dispatch) => {
   });
   console.log("Final over")
 }
-

@@ -6,7 +6,9 @@ import { getUptrend, changeOption, changeDate } from "../../actions";
 
 class OptionChain extends React.Component {
     componentDidMount() {
+        if(_.isEmpty(this.props.data)){
         this.props.getUptrend()
+    }
     }
     componentDidUpdate() {
         if (!_.isEmpty(this.props.selectedDate)) {

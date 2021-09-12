@@ -1,4 +1,4 @@
-import { UPTREND, CHANGE_OPTION, CHANGE_DATE, OPTION_TREND, GET_OPTION_VALUES, SET_PROGRESS } from "../actions/types";
+import { UPTREND, CHANGE_OPTION, CHANGE_DATE, EQUITY_TREND, GET_OPTION_VALUES, SET_PROGRESS } from "../actions/types";
 import _ from 'lodash'
 
 const INTIAL_STATE = {
@@ -8,7 +8,7 @@ const INTIAL_STATE = {
     option: "nifty",
     uptrend: undefined,
     uptrendWithVolume: undefined,
-    optionTrend: false,
+    equityTrend: false,
     options: [],
     progressBar: { progress: 0, isProgressing: false, isComplete: false }
 };
@@ -39,8 +39,8 @@ const uptrendReducer = (state = INTIAL_STATE, action) => {
             let { uptrend, uptrendWithVolume } = setUptrendData(state.data, !_.isObject(action.payload) ? { key: 0, value: action.payload, text: action.payload } : action.payload, state.option)
             return { ...state, selectedDate: !_.isObject(action.payload) ? { key: 0, value: action.payload, text: action.payload } : action.payload, uptrend, uptrendWithVolume }
         }
-        case OPTION_TREND: {
-            return { ...state, optionTrend: action.payload }
+        case EQUITY_TREND: {
+            return { ...state, equityTrend: action.payload }
         }
         case GET_OPTION_VALUES:
             let options = action.payload.map(option => {

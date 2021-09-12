@@ -14,12 +14,12 @@ class Uptrend extends React.Component {
             <div className="ui segment">
                 <div className="four column centered row">
                     <div className="ui toggle checkbox">
-                        <input type="checkbox" name="option trend" disabled={this.props.isProgressing ? "disabled" : ""} checked={this.props.isOptionTrend} onClick={(e) => { this.props.checkOptionTrend(e.target.checked) }} />
-                        <label>Options Trend</label>
+                        <input type="checkbox" name="option trend" disabled={this.props.isProgressing ? "disabled" : ""} checked={this.props.isEquityTrend} onClick={(e) => { this.props.checkOptionTrend(e.target.checked) }} />
+                        <label>Equity Trend</label>
                     </div>
                 </div>
             </div>{
-                this.props.isOptionTrend ? <OptionUptrend /> : <EquityUptrend />
+                this.props.isEquityTrend ?  <EquityUptrend />:<OptionUptrend />
             }
         </div>)
     }
@@ -27,7 +27,7 @@ class Uptrend extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        isOptionTrend: state.uptrend.optionTrend,
+        isEquityTrend: state.uptrend.equityTrend,
         isProgressing: state.uptrend.progressBar.isProgressing
     }
 };
