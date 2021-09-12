@@ -2,29 +2,35 @@ import React from "react";
 import { connect } from "react-redux";
 import _ from "lodash";
 
-import { getOptionValues } from "../../actions";
+import { getOptionValues, resetOptionTrend } from "../../actions";
 
 class OptionUptrend extends React.Component {
     componentDidMount() {
-        if(_.isEmpty(this.props.options)){
-        this.props.getOptionValues();
+        if (_.isEmpty(this.props.options)) {
+            this.props.getOptionValues();
         }
         window.addEventListener("beforeunload", this.handleWindowBeforeUnload);
         this.unmountProgressBar()
+        this.props.refreshRef.current.addEventListener("click", this.onClickRefresh)
     }
 
     componentWillUnmount() {
         window.removeEventListener("beforeunload", this.handleWindowBeforeUnload);
     }
 
-    componentDidUpdate(){
+    componentDidUpdate() {
         this.unmountProgressBar()
     }
-    unmountProgressBar(){
+
+    onClickRefresh = () => {
+        this.props.resetOptionTrend()
+        this.props.getOptionValues();
+    }
+
+    unmountProgressBar() {
         if (this.props.progressBar.isComplete && document.getElementById("progressBar")) {
-            console.log("asdf")
             setTimeout(() => {
-                document.getElementById("progressBar").remove();
+                document.getElementById("progressBarParent").removeChild(document.getElementById("progressBar"));
             }, 3000)
         }
     }
@@ -123,32 +129,34 @@ class OptionUptrend extends React.Component {
     render() {
         return (
             <div className="ui segments">
-                {_.isEmpty(this.props.options) ? null: 
-                <div id="progressBar" className="ui segment">
-                    <div
-                        className={
-                            this.props.progressBar.isComplete
-                                ? `ui active progress success`
-                                : `ui active progress`
-                        }
-                        data-percent={this.props.progressBar.progress}
-                    >
+                {_.isEmpty(this.props.options) ? null :
+                <div id="progressBarParent">
+                    <div id="progressBar" className="ui segment">
                         <div
-                            className="bar"
-                            style={{
-                                width: `${this.props.progressBar.progress}%`,
-                                transitionDuration: "1000ms",
-                            }}
+                            className={
+                                this.props.progressBar.isComplete
+                                    ? `ui active progress success`
+                                    : `ui active progress`
+                            }
+                            data-percent={this.props.progressBar.progress}
                         >
-                            <div className="progress">{`${this.props.progressBar.progress}%`}</div>
-                        </div>
-                        <div className="label">
-                            {this.props.progressBar.isComplete
-                                ? "Its done"
-                                : "Analyzing Options"}
+                            <div
+                                className="bar"
+                                style={{
+                                    width: `${this.props.progressBar.progress}%`,
+                                    transitionDuration: "1000ms",
+                                }}
+                            >
+                                <div className="progress">{`${this.props.progressBar.progress}%`}</div>
+                            </div>
+                            <div className="label">
+                                {this.props.progressBar.isComplete
+                                    ? "Its done"
+                                    : "Analyzing Options"}
+                            </div>
                         </div>
                     </div>
-                </div>
+                    </div>
                 }
                 <div className="ui segment">
                     <div className="ui segments">
@@ -168,4 +176,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, { getOptionValues })(OptionUptrend);
+export default connect(mapStateToProps, { getOptionValues, resetOptionTrend })(OptionUptrend);

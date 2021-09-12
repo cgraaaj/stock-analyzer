@@ -9,6 +9,7 @@ class Uptrend extends React.Component {
     // componentWillUnmount(){
     //     this.props.checkOptionTrend(false)
     // }
+    refreshRef = React.createRef()
     render() {
         return (<div className="ui container">
             <div className="ui segment">
@@ -17,9 +18,11 @@ class Uptrend extends React.Component {
                         <input type="checkbox" name="option trend" disabled={this.props.isProgressing ? "disabled" : ""} checked={this.props.isEquityTrend} onClick={(e) => { this.props.checkOptionTrend(e.target.checked) }} />
                         <label>Equity Trend</label>
                     </div>
+                    {this.props.isEquityTrend ?null:<i ref={this.refreshRef} className="sync icon" onClick={this.onClickRefresh} style={{ cursor: "pointer", margin: "10px" }}>
+                    </i>}
                 </div>
             </div>{
-                this.props.isEquityTrend ?  <EquityUptrend />:<OptionUptrend />
+                this.props.isEquityTrend ? <EquityUptrend /> : <OptionUptrend refreshRef = {this.refreshRef}/>
             }
         </div>)
     }

@@ -1,4 +1,4 @@
-import { UPTREND, CHANGE_OPTION, CHANGE_DATE, EQUITY_TREND, GET_OPTION_VALUES, SET_PROGRESS } from "../actions/types";
+import { UPTREND, CHANGE_OPTION, CHANGE_DATE, EQUITY_TREND, GET_OPTION_VALUES, SET_PROGRESS, RESET_OPTIONTREND,RESET_EQUITYTREND} from "../actions/types";
 import _ from 'lodash'
 
 const INTIAL_STATE = {
@@ -51,6 +51,10 @@ const uptrendReducer = (state = INTIAL_STATE, action) => {
             return { ...state, options }
         case SET_PROGRESS:
             return { ...state, progressBar: action.payload }
+        case RESET_OPTIONTREND:
+            return {...state, options:INTIAL_STATE.options,progressBar:INTIAL_STATE.progressBar}
+        case RESET_EQUITYTREND:
+            return {...state, data:INTIAL_STATE.data,dates:INTIAL_STATE.dates,selectedDate:INTIAL_STATE.selectedDate,option:INTIAL_STATE.option,uptrend:INTIAL_STATE.uptrend,uptrendWithVolume:INTIAL_STATE.uptrendWithVolume}
         default:
             return state
     }

@@ -17,6 +17,8 @@ import {
   EQUITY_TREND,
   GET_OPTION_VALUES,
   SET_PROGRESS,
+  RESET_OPTIONTREND,
+  RESET_EQUITYTREND
 } from "./types";
 import _ from "lodash";
 
@@ -209,4 +211,16 @@ export const getOptionValues = () => async (dispatch) => {
     payload: { progress: 100,isProgressing:false, isComplete: true },
   });
   console.log("Final over")
+}
+
+export const resetOptionTrend = () => {
+  return {
+    type: RESET_OPTIONTREND,
+  };
+}
+
+export const resetEquityTrend = () => {
+  return {
+    type:RESET_EQUITYTREND,
+  }
 }

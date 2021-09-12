@@ -2,13 +2,14 @@ import React from "react";
 import { connect } from "react-redux";
 import _ from "lodash"
 
-import { getUptrend, changeOption, changeDate } from "../../actions";
+import { getUptrend, changeOption, changeDate,resetEquityTrend } from "../../actions";
 
 class OptionChain extends React.Component {
     componentDidMount() {
-        if(_.isEmpty(this.props.data)){
-        this.props.getUptrend()
-    }
+        if (_.isEmpty(this.props.data)) {
+            this.props.getUptrend()
+        }
+        // this.props.refreshRef.current.addEventListener("click", this.onClickRefresh)
     }
     componentDidUpdate() {
         if (!_.isEmpty(this.props.selectedDate)) {
@@ -22,6 +23,10 @@ class OptionChain extends React.Component {
     onChangeDate = (e) => {
         console.log(e.currentTarget.value)
         this.props.changeDate(e.currentTarget.value)
+    }
+    onClickRefresh = () => {
+        this.props.resetEquityTrend()
+        this.props.getUptrend()
     }
     populateItems = (items) => {
         return items.map((item, i) =>
@@ -134,4 +139,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, { getUptrend, changeDate, changeOption })(OptionChain);
+export default connect(mapStateToProps, { getUptrend, changeDate, changeOption,resetEquityTrend })(OptionChain);
