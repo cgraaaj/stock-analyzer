@@ -26,10 +26,10 @@ class OptionTrend:
             temp={}
             temp['name']= symbol
             temp['options']={"calls":{"bullish":0,"bearish":0},"puts":{"bullish":0,"bearish":0}}
-            temp['options']['calls']['bullish'] = len(resp[resp['Call Trend'] == "Bullish"])
-            temp['options']['calls']['bearish'] = len(resp[resp['Call Trend'] == "Bearish"])
-            temp['options']['puts']['bullish'] = len(resp[resp['Put Trend'] == "Bullish"])
-            temp['options']['puts']['bearish'] = len(resp[resp['Put Trend'] == "Bearish"])
+            temp['options']['calls']['bullish'] = resp[resp['Call Trend'] == "Bullish"].count()
+            temp['options']['calls']['bearish'] = resp[resp['Call Trend'] == "Bearish"].count()
+            temp['options']['puts']['bullish'] = resp[resp['Put Trend'] == "Bullish"].count()
+            temp['options']['puts']['bearish'] = resp[resp['Put Trend'] == "Bearish"].count()
             temp['callTrend'] = True if temp['options']['calls']['bullish'] > temp['options']['calls']['bearish'] else False
             temp['putTrend'] = True if temp['options']['puts']['bullish'] > temp['options']['puts']['bearish'] else False
             self.result.append(temp)

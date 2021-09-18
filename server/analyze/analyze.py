@@ -83,9 +83,8 @@ def get_options():
     def generate():
         for ticker in tickers:
             yield json.dumps(analyze_options_data(mode, ticker))+'\n'
-    response = current_app.response_class(generate(),mimetype='application/json')
     # response.headers.add('content-length',26000)
-    return response
+    return current_app.response_class(generate(),mimetype='application/json')
     # return current_app.response_class(stream_with_context(generate()))
 
 #25325

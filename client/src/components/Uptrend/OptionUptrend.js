@@ -37,8 +37,7 @@ class OptionUptrend extends React.Component {
 
     handleWindowBeforeUnload = (ev) => {
         ev.preventDefault();
-        const confirmationMessage = "Do you want to cancel the request";
-        ev.returnValue = confirmationMessage;
+        ev.returnValue =  "Do you want to cancel the request";
     };
     //table rows populate
     populateRow = (options, header) => {
@@ -74,8 +73,8 @@ class OptionUptrend extends React.Component {
         );
         options =
             header === "Call"
-                ? options.sort((a, b) => (a.callTrendDiff > b.callTrendDiff ? -1 : 1))
-                : options.sort((a, b) => (a.putTrendDiff > b.putTrendDiff ? -1 : 1));
+                ? options.sort((a, b) => (b.callTrendDiff - a.callTrendDiff))
+                : options.sort((a, b) => (b.putTrendDiff - a.putTrendDiff));
         let greenIndex = 100 / options.length;
         return options.map((option, i) => (
             <div
