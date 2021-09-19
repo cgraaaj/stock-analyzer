@@ -5,23 +5,29 @@ import { connect } from "react-redux";
 import Chart from "./BarCharts/Chart";
 
 class Modal extends React.Component {
-  renderChart = (data) =>{
-    return (<div style={{
-      paddingBottom: '56.25%', /* 16:9 */
-      position: 'relative',
-      height: 0
-    }} >
-      <div style={{
-        position: 'absolute',
-        top: '0',
-        left: '0',
-        width: '100%',
-        height: '100%'
-      }}>
-        <Chart chartData={data} />
+  renderChart = (data) => {
+    return (
+      <div
+        style={{
+          paddingBottom: "56.25%" /* 16:9 */,
+          position: "relative",
+          height: 0,
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: "0",
+            left: "0",
+            width: "100%",
+            height: "100%",
+          }}
+        >
+          <Chart chartData={data} />
+        </div>
       </div>
-    </div>)
-  }
+    );
+  };
 
   render() {
     return ReactDOM.createPortal(
@@ -35,9 +41,7 @@ class Modal extends React.Component {
         >
           <i className="close icon" onClick={this.props.onDismiss}></i>
           {this.props.data ? (
-            <React.Fragment>
-              {this.renderChart(this.props.data)}
-            </React.Fragment>
+            <React.Fragment>{this.renderChart(this.props.data)}</React.Fragment>
           ) : null}
         </div>
       </div>,
@@ -47,7 +51,7 @@ class Modal extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  return { };
+  return {};
 };
 
-export default connect(mapStateToProps, { })(Modal);
+export default connect(mapStateToProps, {})(Modal);

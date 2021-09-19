@@ -117,7 +117,7 @@ class OptionChain extends React.Component {
               </div>
             </div>
             <div className="ui segment">
-              <div className="ui equal width grid">
+              {/* <div className="ui equal width grid">
                 <div className="equal width row">
                   <div className="ui two column centered grid">
                     StrikePrice vs OI
@@ -136,6 +136,36 @@ class OptionChain extends React.Component {
                   </div>
                   <div
                     className="column"
+                    data-tooltip="Click To Enlarge"
+                    data-position="top right"
+                  >
+                    {this.renderChart(this.props.COIData)}
+                  </div>
+                </div>
+              </div> */}
+              <div className="ui two column doubling grid">
+                <div className="column">
+                  <div className="row">
+                    <div className="ui one column centered grid">
+                      <div className="row">StrikePrice vs OI</div>
+                    </div>
+                  </div>
+                  <div
+                    className="row"
+                    data-tooltip="Click To Enlarge"
+                    data-position="top left"
+                  >
+                    {this.renderChart(this.props.OIData)}
+                  </div>
+                </div>
+                <div className="column">
+                  <div className="row">
+                    <div className="ui one column centered grid">
+                      <div className="row">StrikePrice vs CiOI</div>
+                    </div>
+                  </div>
+                  <div
+                    className="row"
                     data-tooltip="Click To Enlarge"
                     data-position="top right"
                   >
