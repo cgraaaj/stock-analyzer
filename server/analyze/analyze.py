@@ -81,6 +81,7 @@ def get_options():
     mode = "equities"
     tickers = ['NIFTY','BANKNIFTY','FINNIFTY'] if mode == "indices" else get_nse_response(nse.equities_url)
     def generate():
+        # for ticker in tickers[:10]:
         for ticker in tickers:
             yield json.dumps(analyze_options_data(mode, ticker))+'\n'
     # response.headers.add('content-length',26000)

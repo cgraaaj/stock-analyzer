@@ -1,4 +1,4 @@
-import { FETCH_DATA, CHANGE_MODE, SET_FORM_VALUES,RESET } from "../actions/types";
+import { FETCH_DATA, CHANGE_MODE, SET_FORM_VALUES,RESET,RESET_FETCH_DATA} from "../actions/types";
 
 const INTIAL_STATE = {
   label: "Index",
@@ -26,6 +26,9 @@ const confReducer = (state = INTIAL_STATE, action) => {
       }))
       expiryDates.unshift({ key: 's', value: "", text: '--Select--' })
       return { ...state, expiryDates, data: action.payload.data.records, refreshedAt: action.payload.data.records.timestamp };
+    case RESET_FETCH_DATA:
+      return{...state,expiryDates:INTIAL_STATE.expiryDates,data:INTIAL_STATE.data,refreshedAt:INTIAL_STATE.refreshedAt}
+    
     case CHANGE_MODE:
       console.log(action.payload.mode)
       if (action.payload.mode === INTIAL_STATE.formValues.mode) {

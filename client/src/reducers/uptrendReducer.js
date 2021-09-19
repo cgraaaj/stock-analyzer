@@ -1,4 +1,4 @@
-import { UPTREND, CHANGE_OPTION, CHANGE_DATE, EQUITY_TREND, GET_OPTION_VALUES, SET_PROGRESS, RESET_OPTIONTREND,RESET_EQUITYTREND} from "../actions/types";
+import { UPTREND, CHANGE_OPTION, CHANGE_DATE, EQUITY_TREND, GET_OPTION_VALUES, SET_PROGRESS, RESET_OPTIONTREND,RESET_EQUITYTREND, SELECTED_TICKER,FETCH_DATA_UPTREND,RESET_TICKER} from "../actions/types";
 import _ from 'lodash'
 
 const INTIAL_STATE = {
@@ -10,7 +10,9 @@ const INTIAL_STATE = {
     uptrendWithVolume: undefined,
     equityTrend: false,
     options: [],
-    progressBar: { progress: 0, isProgressing: false, isComplete: false }
+    progressBar: { progress: 0, isProgressing: false, isComplete: false },
+    selectedTicker:{},
+    tickerData:{}
 };
 
 const setUptrendData = (data, dateObj, option) => {
@@ -55,6 +57,12 @@ const uptrendReducer = (state = INTIAL_STATE, action) => {
             return {...state, options:INTIAL_STATE.options,progressBar:INTIAL_STATE.progressBar}
         case RESET_EQUITYTREND:
             return {...state, data:INTIAL_STATE.data,dates:INTIAL_STATE.dates,selectedDate:INTIAL_STATE.selectedDate,option:INTIAL_STATE.option,uptrend:INTIAL_STATE.uptrend,uptrendWithVolume:INTIAL_STATE.uptrendWithVolume}
+        case SELECTED_TICKER:
+            return{...state, selectedTicker:action.payload}
+        case FETCH_DATA_UPTREND:
+            return { ...state, tickerData: action.payload.data.records, refreshedAt: action.payload.data.records.timestamp };
+        case RESET_TICKER:
+            return {...state,tickerData:INTIAL_STATE.tickerData,selectedTicker:INTIAL_STATE.selectedTicker }
         default:
             return state
     }

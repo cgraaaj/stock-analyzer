@@ -3,6 +3,7 @@ import { API } from "../utils/api";
 import axios from "axios";
 import {
   FETCH_DATA,
+  RESET_FETCH_DATA,
   CHANGE_MODE,
   ANALYZE_OPTIONS,
   SET_MODAL,
@@ -18,11 +19,14 @@ import {
   GET_OPTION_VALUES,
   SET_PROGRESS,
   RESET_OPTIONTREND,
-  RESET_EQUITYTREND
+  RESET_EQUITYTREND,
+  SELECTED_TICKER,
+  FETCH_DATA_UPTREND,
+  RESET_TICKER
 } from "./types";
 import _ from "lodash";
 
-export const fetchData = (index, symbol) => async (dispatch) => {
+export const fetchData = (page ,index, symbol) => async (dispatch) => {
   let response = "";
   console.log(index, symbol)
   try {
@@ -39,10 +43,17 @@ export const fetchData = (index, symbol) => async (dispatch) => {
     response = err.response;
   }
   dispatch({
-    type: FETCH_DATA,
+    type: page === "UPTREND" ? FETCH_DATA_UPTREND: FETCH_DATA,
     payload: { data: response },
   });
 };
+
+export const resetFetchData = ()=>{
+  return {
+    type: RESET_FETCH_DATA,
+    payload: {}
+  }
+}
 
 export const reset = () => {
   return {
@@ -222,5 +233,18 @@ export const resetOptionTrend = () => {
 export const resetEquityTrend = () => {
   return {
     type:RESET_EQUITYTREND,
+  }
+}
+
+export const selectTicker = (data)=>{
+  return{
+    type: SELECTED_TICKER,
+    payload:data
+  }
+}
+
+export const resetTicker = ()=>{
+  return{
+    type: RESET_TICKER,
   }
 }

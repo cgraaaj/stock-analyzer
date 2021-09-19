@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import _ from "lodash";
 
-import { getOptionValues, resetOptionTrend } from "../../actions";
+import { fetchData, getOptionValues, resetOptionTrend, selectTicker,analyzeOptionChain, getOptionChain, resetTicker} from "../../actions";
 
 class OptionUptrend extends React.Component {
     componentDidMount() {
@@ -20,6 +20,16 @@ class OptionUptrend extends React.Component {
 
     componentDidUpdate() {
         this.unmountProgressBar()
+        this.onSelectTicker()
+    }
+
+    onSelectTicker = ()=>{
+        if(!_.isEmpty(this.props.data)){
+        console.log(this.props.selectedTicker)
+        const values = {mode:this.props.selectedTicker.mode,index:this.props.selectedTicker.index,expiry:this.props.expiryDates[0]}
+        this.props.analyzeOptionChain({ ...values, data: this.props.data });
+        this.props.getOptionChain(values.expiry, this.props.data)
+        }
     }
 
     onClickRefresh = () => {
@@ -31,7 +41,7 @@ class OptionUptrend extends React.Component {
         if (this.props.progressBar.isComplete && document.getElementById("progressBar")) {
             setTimeout(() => {
                 document.getElementById("progressBarParent").removeChild(document.getElementById("progressBar"));
-            }, 3000)
+            }, 1000)
         }
     }
 
@@ -77,10 +87,16 @@ class OptionUptrend extends React.Component {
                 : options.sort((a, b) => (b.putTrendDiff - a.putTrendDiff));
         let greenIndex = 100 / options.length;
         return options.map((option, i) => (
-            <div
+            <div onClick={() => {
+                this.props.resetTicker()
+                this.props.fetchData("UPTREND",'equities', option.name)
+                const selectedTicker={mode:'EQUITY',index:option.name}
+                this.props.selectTicker(selectedTicker)
+            }}
                 style={{
                     color: "white",
                     backgroundColor: `rgb(0,${greenIndex * (i + 1) + 100},0)`,
+                    cursor: "pointer"
                 }}
                 key={i}
                 data-tooltip={
@@ -172,7 +188,10 @@ const mapStateToProps = (state) => {
     return {
         options: state.uptrend.options,
         progressBar: state.uptrend.progressBar,
+        expiryDates: state.uptrend.tickerData.expiryDates,
+        data: state.uptrend.tickerData,
+        selectedTicker: state.uptrend.selectedTicker
     };
 };
 
-export default connect(mapStateToProps, { getOptionValues, resetOptionTrend })(OptionUptrend);
+export default connect(mapStateToProps, { fetchData, getOptionValues, resetOptionTrend,selectTicker, analyzeOptionChain, getOptionChain, resetTicker})(OptionUptrend);

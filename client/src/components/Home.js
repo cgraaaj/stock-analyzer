@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import _ from "lodash";
 
-import { fetchData, changeMode, analyzeOptionChain, setFormValues, getOptionChain,reset } from "../actions";
+import { fetchData, changeMode, analyzeOptionChain, setFormValues, getOptionChain,reset,resetFetchData } from "../actions";
 import { Form, Field, FormSpy } from "react-final-form";
 
 class Home extends React.Component {
@@ -49,7 +49,8 @@ class Home extends React.Component {
   onChangeIndex = (event, input) => {
     console.log(event.target.value);
     input.onChange(event.target.value);
-    if (event.target.value) { this.props.fetchData(this.props.index, event.target.value) }
+    this.props.resetFetchData()
+    if (event.target.value) { this.props.fetchData("HOME",this.props.index, event.target.value) }
   };
 
   onChangeExpiry = (event, input) => {
@@ -230,5 +231,6 @@ export default connect(mapStateToProps, {
   changeMode,
   analyzeOptionChain,
   setFormValues,
-  getOptionChain,reset
+  getOptionChain,reset,
+  resetFetchData
 })(Home);
