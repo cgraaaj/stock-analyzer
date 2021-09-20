@@ -10,6 +10,7 @@ import {
   SELECTED_TICKER,
   FETCH_DATA_UPTREND,
   RESET_TICKER,
+  GET_OPTION_RANK
 } from "../actions/types";
 import _ from "lodash";
 
@@ -25,6 +26,7 @@ const INTIAL_STATE = {
   progressBar: { progress: 0, isProgressing: false, isComplete: false },
   selectedTicker: {},
   tickerData: {},
+  optionRankData: []
 };
 
 const setUptrendData = (data, dateObj, option) => {
@@ -118,6 +120,12 @@ const uptrendReducer = (state = INTIAL_STATE, action) => {
         tickerData: INTIAL_STATE.tickerData,
         selectedTicker: INTIAL_STATE.selectedTicker,
       };
+    case GET_OPTION_RANK:
+      let optionRankData = action.payload[0]
+      return {
+        ...state,
+        optionRankData
+      }
     default:
       return state;
   }

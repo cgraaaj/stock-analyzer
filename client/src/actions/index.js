@@ -1,5 +1,6 @@
 import history from "../history";
 import { API } from "../utils/api";
+import {} from '../utils/constants'
 import axios from "axios";
 import {
   FETCH_DATA,
@@ -23,6 +24,7 @@ import {
   SELECTED_TICKER,
   FETCH_DATA_UPTREND,
   RESET_TICKER,
+  GET_OPTION_RANK
 } from "./types";
 import _ from "lodash";
 
@@ -151,7 +153,8 @@ export const getUptrend = () => async (dispatch) => {
     console.log(response);
   } catch (err) {
     console.log(err);
-    response = err.response;
+    // err response should be handled on server
+    // response = err.response;
   }
   dispatch({
     type: UPTREND,
@@ -258,3 +261,20 @@ export const resetTicker = () => {
     type: RESET_TICKER,
   };
 };
+
+export const getOptionRank = () => async (dispatch) => {
+  let response = "";
+  try {
+    response = await API.get(`/api/analyze/getOptionRank`);
+    response = response.data;
+    console.log(response);
+  } catch (err) {
+    console.log(err);
+    // err response should be handled on server
+    // response = err.response;
+  }
+  dispatch({
+    type:GET_OPTION_RANK,
+    payload:response
+  })
+}

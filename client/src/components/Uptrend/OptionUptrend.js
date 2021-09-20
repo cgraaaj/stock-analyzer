@@ -10,6 +10,7 @@ import {
   analyzeOptionChain,
   getOptionChain,
   resetTicker,
+  getOptionRank
 } from "../../actions";
 
 class OptionUptrend extends React.Component {
@@ -23,6 +24,7 @@ class OptionUptrend extends React.Component {
       "click",
       this.onClickRefresh
     );
+    this.props.getOptionRank()
   }
 
   componentWillUnmount() {
@@ -48,6 +50,7 @@ class OptionUptrend extends React.Component {
   };
 
   onClickRefresh = () => {
+    this.props.resetTicker();
     this.props.resetOptionTrend();
     this.props.getOptionValues();
   };
@@ -65,9 +68,46 @@ class OptionUptrend extends React.Component {
     }
   }
 
+  renderData = (sessions, i) => sessions.map((data, j) => <td data-label={`Session ${sessions[j].session}`}>
+    <div className="ui one column">
+      <div className="row" style={{ color:"green"}}>{sessions[j].options.call[i].name}</div>
+      <div className="row"style={{ color:"red"}}>{sessions[j].options.put[i].name}</div>
+    </div>
+  </td>
+  )
+
+  rendersRows = (sessions) => sessions[0].options.call.map((data, i) =>
+    <tr>
+      {this.renderData(sessions, i)}
+    </tr>
+  )
+
   handleWindowBeforeUnload = (ev) => {
     ev.preventDefault();
     ev.returnValue = "Do you want to cancel the request";
+  };
+
+  rankOptions = () => {
+    return _.isEmpty(this.props.optionRankData) ? null : (
+      <table class="ui celled table">
+        <thead>
+          <tr>
+            {this.props.optionRankData.sessions.map(session => <th>Session {session.session}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {this.rendersRows(this.props.optionRankData.sessions)}
+          {/* {this.props.optionRankData.sessions.options.call.map((session, i) => <tr>
+            <td data-label="Name">
+              <div className="ui one column">
+                <div className="row">{session.options.call[i].name}</div>
+                <div className="row">{session.options.put[i].name}</div>
+              </div>
+            </td>
+          </tr>)} */}
+        </tbody>
+      </table>
+    );
   };
   //table rows populate
   populateRow = (options, header) => {
@@ -196,6 +236,7 @@ class OptionUptrend extends React.Component {
         )}
         <div className="ui segment">
           <div className="ui segments">
+            {this.rankOptions()}
             {this.populateOption(this.props.options, "Call")}
             {this.populateOption(this.props.options, "Put")}
           </div>
@@ -212,6 +253,7 @@ const mapStateToProps = (state) => {
     expiryDates: state.uptrend.tickerData.expiryDates,
     data: state.uptrend.tickerData,
     selectedTicker: state.uptrend.selectedTicker,
+    optionRankData: state.uptrend.optionRankData,
   };
 };
 
@@ -223,4 +265,5 @@ export default connect(mapStateToProps, {
   analyzeOptionChain,
   getOptionChain,
   resetTicker,
+  getOptionRank
 })(OptionUptrend);

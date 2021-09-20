@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append("/home/pudge/Docker/gitlab/stock-analyzer/server/analyze")
 from flask import (
     Blueprint,
@@ -9,7 +10,7 @@ from flask import (
     after_this_request,
     jsonify,
     stream_with_context,
-    Response
+    Response,
 )
 
 import os
@@ -19,7 +20,6 @@ import time
 
 from analyze.oiAnalyze import analyze_stock
 from analyze.get_db import get_database
-from analyze.getOptionTrend import OptionTrend
 from nse.nse import get_nse_response
 from nse import nse
 
@@ -70,40 +70,74 @@ def get_uptrend():
     return jsonify(res)
     # return json.dumps(res)
 
+
 @analyze.route("/getContentLength", methods=["GET"])
 def get_content_length():
     current_app.logger.info(f"content length")
     return "26000"
 
+
 @analyze.route("/options", methods=["GET"])
 def get_options():
     current_app.logger.info(f"analyzing data")
     mode = "equities"
-    tickers = ['NIFTY','BANKNIFTY','FINNIFTY'] if mode == "indices" else get_nse_response(nse.equities_url)
+    tickers = (
+        ["NIFTY", "BANKNIFTY", "FINNIFTY"]
+        if mode == "indices"
+        else get_nse_response(nse.equities_url)
+    )
+
     def generate():
         # for ticker in tickers[:10]:
         for ticker in tickers:
-            yield json.dumps(analyze_options_data(mode, ticker))+'\n'
+            yield json.dumps(analyze_options_data(mode, ticker)) + "\n"
+
     # response.headers.add('content-length',26000)
-    return current_app.response_class(generate(),mimetype='application/json')
+    return current_app.response_class(generate(), mimetype="application/json")
     # return current_app.response_class(stream_with_context(generate()))
 
-#25325
+@analyze.route("/getOptionRank", methods=["GET"])
+def get_option_rank():
+    current_app.logger.info(f"fetching data")
+    collection = db["rankOptions"]
+    res = list(
+        collection.find(
+            {},
+            {"_id": 0, "date": 1, "sessions": 1},
+            limit=1,
+            sort=[("_id", pymongo.DESCENDING)],
+        )
+    )
+    current_app.logger.info(res)
+    return jsonify(res)
+
+# 25325
 def analyze_options_data(index, symbol):
     url = nse.option_chain_url.format(index, symbol)
     try:
-        resp= get_nse_response(url)
-        resp = analyze_stock(resp['records']['expiryDates'][0],resp['records'])
+        resp = get_nse_response(url)
+        resp = analyze_stock(resp["records"]["expiryDates"][0], resp["records"])
         # pprint(resp)
-        temp={}
-        temp['name']= symbol
-        temp['options']={"calls":{"bullish":0,"bearish":0},"puts":{"bullish":0,"bearish":0}}
-        temp['options']['calls']['bullish'] = len(resp[resp['Call Trend'] == "Bullish"])
-        temp['options']['calls']['bearish'] = len(resp[resp['Call Trend'] == "Bearish"])
-        temp['options']['puts']['bullish'] = len(resp[resp['Put Trend'] == "Bullish"])
-        temp['options']['puts']['bearish'] = len(resp[resp['Put Trend'] == "Bearish"])
-        temp['callTrend'] = True if temp['options']['calls']['bullish'] > temp['options']['calls']['bearish'] else False
-        temp['putTrend'] = True if temp['options']['puts']['bullish'] > temp['options']['puts']['bearish'] else False
+        temp = {}
+        temp["name"] = symbol
+        temp["options"] = {
+            "calls": {"bullish": 0, "bearish": 0},
+            "puts": {"bullish": 0, "bearish": 0},
+        }
+        temp["options"]["calls"]["bullish"] = len(resp[resp["Call Trend"] == "Bullish"])
+        temp["options"]["calls"]["bearish"] = len(resp[resp["Call Trend"] == "Bearish"])
+        temp["options"]["puts"]["bullish"] = len(resp[resp["Put Trend"] == "Bullish"])
+        temp["options"]["puts"]["bearish"] = len(resp[resp["Put Trend"] == "Bearish"])
+        temp["callTrend"] = (
+            True
+            if temp["options"]["calls"]["bullish"] > temp["options"]["calls"]["bearish"]
+            else False
+        )
+        temp["putTrend"] = (
+            True
+            if temp["options"]["puts"]["bullish"] > temp["options"]["puts"]["bearish"]
+            else False
+        )
         return temp
     except:
         print(symbol)
