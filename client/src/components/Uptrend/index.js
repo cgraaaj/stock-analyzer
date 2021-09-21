@@ -12,7 +12,7 @@ class Uptrend extends React.Component {
   refreshRef = React.createRef();
   render() {
     return (
-      <div className="ui container">
+      <div>
         <div className="ui segment">
           <div className="four column centered row">
             <div className="ui toggle checkbox">

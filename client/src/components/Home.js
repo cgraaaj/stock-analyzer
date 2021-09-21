@@ -103,7 +103,7 @@ class Home extends React.Component {
             <label>{label}</label>
           </div>
         </div>
-        <div className="column">
+        <div className="column" style={{ width: "25%" }}>
           {_.isEmpty(options) ? (
             <div className="ui disabled dropdown">
               Select <i className="dropdown icon"></i>
@@ -135,7 +135,7 @@ class Home extends React.Component {
 
   render() {
     return (
-      <div className="ui container" >
+      <div>
         <div className="ui segments">
           <div className="ui segment">
             <div className="ui one column centered grid">
@@ -193,30 +193,30 @@ class Home extends React.Component {
                             <div className="column">
                               <div className="ui right aligned container">
                                 <button
-                                  type="submit"
+                                  type="button"
                                   className={
-                                    values.hasOwnProperty("expiry") &&
-                                    !_.isEmpty(values.expiry)
-                                      ? "ui primary button"
+                                    values.hasOwnProperty("index") &&
+                                      !_.isEmpty(values.index)
+                                      ? "ui secondary button"
                                       : "ui disabled button"
                                   }
+                                  onClick={this.onClickReset}
                                 >
-                                  Submit
+                                  Reset
                                 </button>
                               </div>
                             </div>
                             <div className="column">
                               <button
-                                type="button"
+                                type="submit"
                                 className={
-                                  values.hasOwnProperty("index") &&
-                                  !_.isEmpty(values.index)
-                                    ? "ui secondary button"
+                                  values.hasOwnProperty("expiry") &&
+                                    !_.isEmpty(values.expiry)
+                                    ? "ui primary button"
                                     : "ui disabled button"
                                 }
-                                onClick={this.onClickReset}
                               >
-                                Reset
+                                Submit
                               </button>
                             </div>
                           </div>

@@ -77,8 +77,8 @@ class OptionUptrend extends React.Component {
 
   renderData = (sessions, i) => sessions.map((data, j) => <td key={j} data-label={`Session ${sessions[j].session}`}>
     <div className="ui one column">
-      <div className="row" style={{ color: "green" }}>{sessions[j].options.call[i].name}</div>
-      <div className="row" style={{ color: "red" }}>{sessions[j].options.put[i].name}</div>
+      <div className="row callData" style={{ color: "green" }} >{sessions[j].options.call[i].name}</div>
+      <div className="row putData" style={{ color: "red" }} >{sessions[j].options.put[i].name}</div>
     </div>
   </td>
   )
@@ -95,59 +95,98 @@ class OptionUptrend extends React.Component {
   };
 
   rankOptions = () => {
+    let clickCounter = 1
     return _.isEmpty(this.props.optionRankData) ? null : (
       <div className="ui segment">
-        <div className="ui one column grid container">
-          <div className="row">
-            <div className="ui grid">
-              <div className="left floated column">Option Ranks</div>
+        <div className="ui one column grid">
+          <div class="one column centered row">
+            <div className="column" >
+              <div className="ui toggle checkbox">
+                <input
+                  type="checkbox"
+                  name="rank options"
+                  onClick={(e) => {
+                    let el = document.getElementById("optionRankTable")
+                    if (e.target.checked) {
+                      el.style.display = ''
+                    } else {
+                      el.style.display = 'none'
+                    }
+                  }}
+                />
+                <label><text
+                  style={{ cursor: "pointer" }}
+                  data-tooltip="Click to toggle"
+                  data-position="right center"
+                  data-label="rankOptions"
+                  onClick={() => {
+                    let putEls = document.getElementsByClassName("putData")
+                    let callEls = document.getElementsByClassName("callData")
+                    if (clickCounter % 3 === 1) {
+                      console.log(putEls)
+                      Array.from(putEls).forEach(putEl => putEl.style.display = 'none')
+                      clickCounter += 1
+                      console.log(clickCounter)
+                    } else if (clickCounter % 3 === 2) {
+                      Array.from(callEls).forEach(callEl => callEl.style.display = 'none')
+                      Array.from(putEls).forEach(putEl => putEl.style.display = '')
+                      clickCounter += 1
+                      console.log(clickCounter)
+                    } else {
+                      Array.from(callEls).forEach(callEl => callEl.style.display = '')
+                      clickCounter += 1
+                      console.log(clickCounter)
+                    }
+                  }}
+                >Option's Rank</text></label>
+              </div>
             </div>
           </div>
           <div className="row">
-            <div className="ui container">
-              <table className="ui celled table">
-                <thead>
-                  <tr>
-                    {this.props.optionRankData.sessions.map(session => <th>Session {session.session}</th>)}
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.rendersRows(this.props.optionRankData.sessions)}
-                </tbody>
-              </table>
-            </div>
+            {/* <div className="ui segment"  style={{width: "100%" }}> */}
+            <table id="optionRankTable" style={{ display: 'none' }} className="ui celled table">
+              <thead>
+                <tr>
+                  {this.props.optionRankData.sessions.map(session => <th>Session {session.session}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {this.rendersRows(this.props.optionRankData.sessions)}
+              </tbody>
+            </table>
           </div>
         </div>
+        {/* </div> */}
       </div>
     );
   };
   //table rows populate
-  populateRow = (options, header) => {
-    options =
-      header === "Call"
-        ? options.sort((a, b) => (a.callTrendDiff > b.callTrendDiff ? -1 : 1))
-        : options.sort((a, b) => (a.putTrendDiff > b.putTrendDiff ? -1 : 1));
-    let greenIndex = 100 / options.length;
-    return options.map((option, i) => (
-      <tr
-        style={{ backgroundColor: `rgb(0,${greenIndex * (i + 1) + 100},0)` }}
-        key={i}
-      >
-        <td
-          style={{ color: "white" }}
-          data-tooltip={
-            header === "Call"
-              ? `Bullish:${option.options.calls.bullish} Bearish:${option.options.calls.bearish} `
-              : `Bullish:${option.options.puts.bullish} Bearish:${option.options.puts.bearish}`
-          }
-          data-position="top right"
-          data-label={header}
-        >
-          {option.name}
-        </td>
-      </tr>
-    ));
-  };
+  // populateRow = (options, header) => {
+  //   options =
+  //     header === "Call"
+  //       ? options.sort((a, b) => (a.callTrendDiff > b.callTrendDiff ? -1 : 1))
+  //       : options.sort((a, b) => (a.putTrendDiff > b.putTrendDiff ? -1 : 1));
+  //   let greenIndex = 100 / options.length;
+  //   return options.map((option, i) => (
+  //     <tr
+  //       style={{ backgroundColor: `rgb(0,${greenIndex * (i + 1) + 100},0)` }}
+  //       key={i}
+  //     >
+  //       <td
+  //         style={{ color: "white" }}
+  //         data-tooltip={
+  //           header === "Call"
+  //             ? `Bullish:${option.options.calls.bullish} Bearish:${option.options.calls.bearish} `
+  //             : `Bullish:${option.options.puts.bullish} Bearish:${option.options.puts.bearish}`
+  //         }
+  //         data-position="top center"
+  //         data-label={header}
+  //       >
+  //         {option.name}
+  //       </td>
+  //     </tr>
+  //   ));
+  // };
 
   populateGridRow = (options, header) => {
     options = options.filter((option) =>
@@ -177,7 +216,7 @@ class OptionUptrend extends React.Component {
             ? `Bullish:${option.options.calls.bullish} Bearish:${option.options.calls.bearish} `
             : `Bullish:${option.options.puts.bullish} Bearish:${option.options.puts.bearish}`
         }
-        data-position="top right"
+        data-position="top center"
         data-label={header}
         className="column"
       >
@@ -190,24 +229,22 @@ class OptionUptrend extends React.Component {
   populateOption = (options, header) => {
     return (
       <div className="ui segment">
-        <div className="ui one column grid container">
-          <div className="row">
-            <div className="ui grid">
-              <div className="left floated column">{header}</div>
-            </div>
+        <div className="ui one column grid">
+          <div class="one column centered row">
+            <div className="column">{header}</div>
           </div>
           <div className="row">
-            <div className="ui container">
-              {_.isEmpty(options) ? (
-                <div className="ui active inverted dimmer">
-                  <div className="ui text loader">Loading</div>
-                </div>
-              ) : (
-                <div className="ui eight column doubling grid">
+            {_.isEmpty(options) ? (
+              <div className="ui active inverted dimmer centered inline loader">
+                <div className="ui text loader">Loading</div>
+              </div>
+            ) : (
+              <div className="ui segment" style={{ width: "100%" }}>
+                <div className="ui ten column doubling grid">
                   {this.populateGridRow(options, header)}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
