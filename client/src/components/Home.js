@@ -135,7 +135,7 @@ class Home extends React.Component {
 
   render() {
     return (
-      <div className="ui container">
+      <div className="ui container" >
         <div className="ui segments">
           <div className="ui segment">
             <div className="ui one column centered grid">

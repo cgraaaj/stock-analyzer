@@ -19,12 +19,14 @@ import {
   EQUITY_TREND,
   GET_OPTION_VALUES,
   SET_PROGRESS,
+  RESET_PROGRESS,
   RESET_OPTIONTREND,
   RESET_EQUITYTREND,
   SELECTED_TICKER,
   FETCH_DATA_UPTREND,
   RESET_TICKER,
-  GET_OPTION_RANK
+  GET_OPTION_RANK,
+  UNSELECT_TICKER
 } from "./types";
 import _ from "lodash";
 
@@ -220,6 +222,7 @@ export const getOptionValues = () => async (dispatch) => {
             progress: percentCompleted,
             isProgressing: true,
             isComplete: false,
+            isLoaded: true
           },
         });
       },
@@ -232,9 +235,15 @@ export const getOptionValues = () => async (dispatch) => {
   }
   dispatch({
     type: SET_PROGRESS,
-    payload: { progress: 100, isProgressing: false, isComplete: true },
+    payload: { progress: 100, isProgressing: false, isComplete: true,  isLoaded: true  },
   });
   console.log("Final over");
+};
+
+export const resetProgress = () => {
+  return {
+    type: RESET_PROGRESS,
+  };
 };
 
 export const resetOptionTrend = () => {
@@ -253,6 +262,13 @@ export const selectTicker = (data) => {
   return {
     type: SELECTED_TICKER,
     payload: data,
+  };
+};
+
+export const unselectTicker = () => {
+  return {
+    type: UNSELECT_TICKER,
+    payload: {}
   };
 };
 

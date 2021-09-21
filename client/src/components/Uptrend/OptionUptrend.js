@@ -10,11 +10,15 @@ import {
   analyzeOptionChain,
   getOptionChain,
   resetTicker,
-  getOptionRank
+  getOptionRank,
+  unselectTicker,
+  resetProgress
 } from "../../actions";
 
 class OptionUptrend extends React.Component {
+
   componentDidMount() {
+    // this.props.resetProgress()
     if (_.isEmpty(this.props.options)) {
       this.props.getOptionValues();
     }
@@ -33,11 +37,11 @@ class OptionUptrend extends React.Component {
 
   componentDidUpdate() {
     this.unmountProgressBar();
-    this.onSelectTicker();
+    this.onSelectTicker()
   }
 
   onSelectTicker = () => {
-    if (!_.isEmpty(this.props.data)) {
+    if (!_.isEmpty(this.props.data) && this.props.selectedTicker.selected) {
       console.log(this.props.selectedTicker);
       const values = {
         mode: this.props.selectedTicker.mode,
@@ -46,6 +50,7 @@ class OptionUptrend extends React.Component {
       };
       this.props.analyzeOptionChain({ ...values, data: this.props.data });
       this.props.getOptionChain(values.expiry, this.props.data);
+      this.props.unselectTicker();
     }
   };
 
@@ -58,26 +63,28 @@ class OptionUptrend extends React.Component {
   unmountProgressBar() {
     if (
       this.props.progressBar.isComplete &&
-      document.getElementById("progressBar")
+      document.getElementById("progressBar") &&
+      this.props.progressBar.isLoaded
     ) {
       setTimeout(() => {
         document
           .getElementById("progressBarParent")
           .removeChild(document.getElementById("progressBar"));
+        this.props.resetProgress()
       }, 1000);
     }
   }
 
-  renderData = (sessions, i) => sessions.map((data, j) => <td data-label={`Session ${sessions[j].session}`}>
+  renderData = (sessions, i) => sessions.map((data, j) => <td key={j} data-label={`Session ${sessions[j].session}`}>
     <div className="ui one column">
-      <div className="row" style={{ color:"green"}}>{sessions[j].options.call[i].name}</div>
-      <div className="row"style={{ color:"red"}}>{sessions[j].options.put[i].name}</div>
+      <div className="row" style={{ color: "green" }}>{sessions[j].options.call[i].name}</div>
+      <div className="row" style={{ color: "red" }}>{sessions[j].options.put[i].name}</div>
     </div>
   </td>
   )
 
   rendersRows = (sessions) => sessions[0].options.call.map((data, i) =>
-    <tr>
+    <tr key={i}>
       {this.renderData(sessions, i)}
     </tr>
   )
@@ -89,24 +96,29 @@ class OptionUptrend extends React.Component {
 
   rankOptions = () => {
     return _.isEmpty(this.props.optionRankData) ? null : (
-      <table class="ui celled table">
-        <thead>
-          <tr>
-            {this.props.optionRankData.sessions.map(session => <th>Session {session.session}</th>)}
-          </tr>
-        </thead>
-        <tbody>
-          {this.rendersRows(this.props.optionRankData.sessions)}
-          {/* {this.props.optionRankData.sessions.options.call.map((session, i) => <tr>
-            <td data-label="Name">
-              <div className="ui one column">
-                <div className="row">{session.options.call[i].name}</div>
-                <div className="row">{session.options.put[i].name}</div>
-              </div>
-            </td>
-          </tr>)} */}
-        </tbody>
-      </table>
+      <div className="ui segment">
+        <div className="ui one column grid container">
+          <div className="row">
+            <div className="ui grid">
+              <div className="left floated column">Option Ranks</div>
+            </div>
+          </div>
+          <div className="row">
+            <div className="ui container">
+              <table className="ui celled table">
+                <thead>
+                  <tr>
+                    {this.props.optionRankData.sessions.map(session => <th>Session {session.session}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {this.rendersRows(this.props.optionRankData.sessions)}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   };
   //table rows populate
@@ -151,7 +163,7 @@ class OptionUptrend extends React.Component {
         onClick={() => {
           this.props.resetTicker();
           this.props.fetchData("UPTREND", "equities", option.name);
-          const selectedTicker = { mode: "EQUITY", index: option.name };
+          const selectedTicker = { mode: "EQUITY", index: option.name, selected: true };
           this.props.selectTicker(selectedTicker);
         }}
         style={{
@@ -205,7 +217,7 @@ class OptionUptrend extends React.Component {
   render() {
     return (
       <div className="ui segments">
-        {_.isEmpty(this.props.options) ? null : (
+        {_.isEmpty(this.props.options) ? null : this.props.progressBar.isLoaded ? (
           <div id="progressBarParent">
             <div id="progressBar" className="ui segment">
               <div
@@ -233,7 +245,7 @@ class OptionUptrend extends React.Component {
               </div>
             </div>
           </div>
-        )}
+        ) : null}
         <div className="ui segment">
           <div className="ui segments">
             {this.rankOptions()}
@@ -265,5 +277,7 @@ export default connect(mapStateToProps, {
   analyzeOptionChain,
   getOptionChain,
   resetTicker,
-  getOptionRank
+  getOptionRank,
+  unselectTicker,
+  resetProgress
 })(OptionUptrend);
