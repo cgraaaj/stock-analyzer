@@ -17,11 +17,13 @@ import os
 import pymongo
 import json
 import time
+import math
 
 from analyze.oiAnalyze import analyze_stock
 from analyze.get_db import get_database
 from nse.nse import get_nse_response
 from nse import nse
+from urllib.parse import quote
 
 analyze = Blueprint("analyze", __name__)
 db = get_database()
@@ -113,7 +115,8 @@ def get_option_rank():
 
 # 25325
 def analyze_options_data(index, symbol):
-    url = nse.option_chain_url.format(index, symbol)
+    url = nse.option_chain_url.format(index, quote(symbol))
+    resp={}
     try:
         resp = get_nse_response(url)
         resp = analyze_stock(resp["records"]["expiryDates"][0], resp["records"])
@@ -121,13 +124,36 @@ def analyze_options_data(index, symbol):
         temp = {}
         temp["name"] = symbol
         temp["options"] = {
-            "calls": {"bullish": 0, "bearish": 0},
-            "puts": {"bullish": 0, "bearish": 0},
+            "calls": {"bullish": 0, "bearish": 0, "percentage":0, "grade":""},
+            "puts": {"bullish": 0, "bearish": 0,"percentage":0, "grade":""},
         }
+
         temp["options"]["calls"]["bullish"] = len(resp[resp["Call Trend"] == "Bullish"])
         temp["options"]["calls"]["bearish"] = len(resp[resp["Call Trend"] == "Bearish"])
+        if(temp["options"]["calls"]["bullish"]==0):
+            temp["options"]["calls"]["percentage"] = 0
+        else:
+            temp["options"]["calls"]["percentage"] = math.ceil(((temp["options"]["calls"]["bullish"] - temp["options"]["calls"]["bearish"])/temp["options"]["calls"]["bullish"])*100)
+        if(temp["options"]["calls"]["percentage"]>85):
+            temp["options"]["calls"]["grade"] ="A"
+        elif(temp["options"]["calls"]["percentage"]>50 and temp["options"]["calls"]["percentage"]<=85):
+            temp["options"]["calls"]["grade"] ="B"
+        else:
+            temp["options"]["calls"]["grade"] ="C"
+        
         temp["options"]["puts"]["bullish"] = len(resp[resp["Put Trend"] == "Bullish"])
         temp["options"]["puts"]["bearish"] = len(resp[resp["Put Trend"] == "Bearish"])
+        if(temp["options"]["puts"]["bullish"] == 0):
+            temp["options"]["puts"]["percentage"] = 0
+        else:
+            temp["options"]["puts"]["percentage"] = math.ceil(((temp["options"]["puts"]["bullish"] - temp["options"]["puts"]["bearish"])/temp["options"]["puts"]["bullish"])*100)
+        if(temp["options"]["puts"]["percentage"]>85):
+            temp["options"]["puts"]["grade"] ="A"
+        elif(temp["options"]["puts"]["percentage"]>50 and temp["options"]["puts"]["percentage"]<=85):
+            temp["options"]["puts"]["grade"] ="B"
+        else:
+            temp["options"]["puts"]["grade"] ="C"
+
         temp["callTrend"] = (
             True
             if temp["options"]["calls"]["bullish"] > temp["options"]["calls"]["bearish"]
@@ -139,5 +165,7 @@ def analyze_options_data(index, symbol):
             else False
         )
         return temp
-    except:
-        print(symbol)
+    except Exception as e:
+        # current_app.logger.info(symbol)
+        print(f"got Exception {e} on {symbol} the response is {resp}")
+

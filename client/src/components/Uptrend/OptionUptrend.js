@@ -58,6 +58,7 @@ class OptionUptrend extends React.Component {
     this.props.resetTicker();
     this.props.resetOptionTrend();
     this.props.getOptionValues();
+    this.props.getOptionRank()
   };
 
   unmountProgressBar() {
@@ -96,10 +97,11 @@ class OptionUptrend extends React.Component {
 
   rankOptions = () => {
     let clickCounter = 1
-    return _.isEmpty(this.props.optionRankData) ? null : (
+    let totClick = 3
+    return _.isEmpty(this.props.sessions) ? null : (
       <div className="ui segment">
         <div className="ui one column grid">
-          <div class="one column centered row">
+          <div className="one column centered row">
             <div className="column" >
               <div className="ui toggle checkbox">
                 <input
@@ -122,12 +124,12 @@ class OptionUptrend extends React.Component {
                   onClick={() => {
                     let putEls = document.getElementsByClassName("putData")
                     let callEls = document.getElementsByClassName("callData")
-                    if (clickCounter % 3 === 1) {
+                    if (clickCounter % totClick === 1) {
                       console.log(putEls)
                       Array.from(putEls).forEach(putEl => putEl.style.display = 'none')
                       clickCounter += 1
                       console.log(clickCounter)
-                    } else if (clickCounter % 3 === 2) {
+                    } else if (clickCounter % totClick === 2) {
                       Array.from(callEls).forEach(callEl => callEl.style.display = 'none')
                       Array.from(putEls).forEach(putEl => putEl.style.display = '')
                       clickCounter += 1
@@ -147,11 +149,11 @@ class OptionUptrend extends React.Component {
             <table id="optionRankTable" style={{ display: 'none' }} className="ui celled table">
               <thead>
                 <tr>
-                  {this.props.optionRankData.sessions.map(session => <th>Session {session.session}</th>)}
+                  {this.props.sessions.map(session => <th>Session {+session.session - 1}</th>)}
                 </tr>
               </thead>
               <tbody>
-                {this.rendersRows(this.props.optionRankData.sessions)}
+                {this.rendersRows(this.props.sessions)}
               </tbody>
             </table>
           </div>
@@ -227,11 +229,45 @@ class OptionUptrend extends React.Component {
   };
 
   populateOption = (options, header) => {
+    let gradeOptions = options.reduce((optionsGrade, option) => {
+      let headerGrade = header === 'Call' ? option.options.calls.grade : option.options.puts.grade
+      let grade = (optionsGrade[headerGrade] || [])
+      grade.push(option)
+      optionsGrade[headerGrade] = grade
+      return optionsGrade
+    }, {})
+    // sort by grades
+    gradeOptions = Object.keys(gradeOptions).sort().reduce((obj, key) => {
+      obj[key] = gradeOptions[key];
+      return obj;
+    }, {});
     return (
       <div className="ui segment">
         <div className="ui one column grid">
-          <div class="one column centered row">
-            <div className="column">{header}</div>
+          <div className="two column equal width row">
+            {/* <div classname="column">
+            {header}
+            </div> */}
+            <div className="column">
+              <div className="ui toggle checkbox">
+                <input
+                  type="checkbox"
+                  name={`${header}PercentView`}
+                  onClick={(e) => {
+                    let percentViewEl = document.getElementById(`${header}PercentView`)
+                    let liquidityViewEl = document.getElementById(`${header}LiquidityView`)
+                    if (e.target.checked) {
+                      liquidityViewEl.style.display = 'none'
+                      percentViewEl.style.display = ''
+                    } else {
+                      percentViewEl.style.display = 'none'
+                      liquidityViewEl.style.display = ''
+                    }
+                  }}
+                />
+                <label>{header} Grade View</label>
+              </div>
+            </div>
           </div>
           <div className="row">
             {_.isEmpty(options) ? (
@@ -239,9 +275,30 @@ class OptionUptrend extends React.Component {
                 <div className="ui text loader">Loading</div>
               </div>
             ) : (
-              <div className="ui segment" style={{ width: "100%" }}>
-                <div className="ui ten column doubling grid">
-                  {this.populateGridRow(options, header)}
+              <div className="ui segments">
+                <div className="ui segment" style={{ width: "100%" }} id={`${header}LiquidityView`}>
+                  <div className="ui ten column doubling grid">
+                    {this.populateGridRow(options, header)}
+                  </div>
+                </div>
+                <div className="ui segment" style={{ width: "100%", display: 'none' }} id={`${header}PercentView`} >
+                  {console.log(options.reduce((optionsGrade, option) => {
+                    let headerGrade = header === 'Call' ? option.options.calls.grade : option.options.puts.grade
+                    let grade = (optionsGrade[headerGrade] || [])
+                    grade.push(option)
+                    optionsGrade[headerGrade] = grade
+                    return optionsGrade
+                  }, {}))}
+                  {Object.keys(gradeOptions).map(grade => <div className="ui one column grid">
+                    <div className="row"> Grade {grade}</div>
+                    <div className="row">
+                      <div className="ui segment" style={{ width: "100%" }}>
+                        <div className="ui ten column doubling grid">
+                          {this.populateGridRow(gradeOptions[grade], header)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>)}
                 </div>
               </div>
             )}
@@ -296,6 +353,10 @@ class OptionUptrend extends React.Component {
 }
 
 const mapStateToProps = (state) => {
+  let sessions = state.uptrend.optionRankData.sessions
+  if (!_.isEmpty(state.uptrend.optionRankData)) {
+    sessions = sessions.filter(session => session.session !== '1' && session.session !== '14')
+  }
   return {
     options: state.uptrend.options,
     progressBar: state.uptrend.progressBar,
@@ -303,6 +364,7 @@ const mapStateToProps = (state) => {
     data: state.uptrend.tickerData,
     selectedTicker: state.uptrend.selectedTicker,
     optionRankData: state.uptrend.optionRankData,
+    sessions
   };
 };
 
