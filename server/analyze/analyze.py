@@ -28,7 +28,6 @@ from urllib.parse import quote
 analyze = Blueprint("analyze", __name__)
 db = get_database()
 
-
 @analyze.route("/option-chain", methods=["POST"])
 def option_chain():
     print(request.args.get("expiry"))
@@ -76,7 +75,7 @@ def get_uptrend():
 @analyze.route("/getContentLength", methods=["GET"])
 def get_content_length():
     current_app.logger.info(f"content length")
-    return "26000"
+    return "33000"
 
 
 @analyze.route("/options", methods=["GET"])
