@@ -75,7 +75,7 @@ class OptionChain extends React.Component {
 
   render() {
     return (
-      <div className="ui container">
+      <div>
         {_.isEmpty(this.props.OIData) && _.isEmpty(this.props.COIData) ? (
           <div className="ui two column centered grid">
             <h3>
@@ -115,6 +115,11 @@ class OptionChain extends React.Component {
                   </svg>
                 </div>
               </div>
+              <div className="ui two column centered grid">
+              <h5 style={{ margin: "10px" , fontStyle:"italic"}}>
+                  Currently Viewing {this.props.selectedExpiry} Expiry
+                </h5>
+                </div>
             </div>
             <div className="ui segment">
               {/* <div className="ui equal width grid">

@@ -12,7 +12,9 @@ import {
   RESET_TICKER,
   GET_OPTION_RANK,
   UNSELECT_TICKER,
-  RESET_PROGRESS
+  RESET_PROGRESS,
+  SELECTED_EXPIRY,
+  GET_EXPIRY
 } from "../actions/types";
 import _ from "lodash";
 
@@ -28,7 +30,9 @@ const INTIAL_STATE = {
   progressBar: { progress: 0, isProgressing: false, isComplete: false, isLoaded:true },
   selectedTicker: {},
   tickerData: {},
-  optionRankData: []
+  optionRankData: [],
+  expiryDates:[],
+  selectedExpiry:""
 };
 
 const setUptrendData = (data, dateObj, option) => {
@@ -131,6 +135,19 @@ const uptrendReducer = (state = INTIAL_STATE, action) => {
       return {
         ...state,
         optionRankData
+      }
+    case GET_EXPIRY:
+      // console.log(action.payload.data.records.expiryDates)
+      let expiryDates= action.payload.data.records.expiryDates
+      expiryDates.unshift("--Select--")
+      return{
+        ...state,
+        expiryDates
+      }
+    case SELECTED_EXPIRY:
+      return{
+        ...state,
+        selectedExpiry:action.payload
       }
     default:
       return state;

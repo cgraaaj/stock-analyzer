@@ -30,3 +30,6 @@ export const RESET_TICKER = "RESET_TICKER";
 
 export const GET_OPTION_RANK = "GET_OPTION_RANK";
 export const RESET_PROGRESS= "RESET_PROGRESS"
+
+export const GET_EXPIRY = "GET_EXPIRY"
+export const SELECTED_EXPIRY= "SELECTED_EXPIRY"

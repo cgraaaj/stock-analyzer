@@ -26,7 +26,9 @@ import {
   FETCH_DATA_UPTREND,
   RESET_TICKER,
   GET_OPTION_RANK,
-  UNSELECT_TICKER
+  UNSELECT_TICKER,
+  SELECTED_EXPIRY,
+  GET_EXPIRY
 } from "./types";
 import _ from "lodash";
 
@@ -195,11 +197,14 @@ function IsJsonString(str) {
   return true;
 }
 
-export const getOptionValues = () => async (dispatch) => {
+export const getOptionValues = (expiry) => async (dispatch) => {
   let response = "";
   try {
     let contentLength = await API.get(`/api/analyze/getContentLength`);
     response = await API.get(`/api/analyze/options`, {
+      params: {
+        expiry
+      },
       onDownloadProgress: (progressEvent) => {
         const chunk = progressEvent.currentTarget.response;
         let res = [];
@@ -278,6 +283,29 @@ export const resetTicker = () => {
   };
 };
 
+export const getExpiryDates = () => async(dispatch) => {
+  let response =''
+  let index = 'equities'
+  let symbol = 'RELIANCE'
+  try {
+    response = await API.get("/api/nse/option-chain", {
+      params: {
+        index,
+        symbol,
+      },
+    });
+    console.log(response.data);
+    response = response.data;
+  } catch (err) {
+    console.log(err);
+    response = err.response;
+  }
+  dispatch({
+    type:GET_EXPIRY,
+    payload:{data:response}
+  })
+}
+
 export const getOptionRank = () => async (dispatch) => {
   let response = "";
   try {
@@ -293,4 +321,12 @@ export const getOptionRank = () => async (dispatch) => {
     type:GET_OPTION_RANK,
     payload:response
   })
+  // this.getOptionValues()
+}
+
+export const selectExpiry = (expiry)=>{
+  return{
+    type:SELECTED_EXPIRY,
+    payload:expiry
+  }
 }

@@ -103,7 +103,7 @@ class Home extends React.Component {
             <label>{label}</label>
           </div>
         </div>
-        <div className="column" style={{ width: "25%" }}>
+        <div className="column" style={{ width: "50%" }}>
           {_.isEmpty(options) ? (
             <div className="ui disabled dropdown">
               Select <i className="dropdown icon"></i>

@@ -12,16 +12,19 @@ import {
   resetTicker,
   getOptionRank,
   unselectTicker,
-  resetProgress
+  resetProgress,
+  getExpiryDates,
+  selectExpiry
 } from "../../actions";
 
 class OptionUptrend extends React.Component {
 
   componentDidMount() {
     // this.props.resetProgress()
-    if (_.isEmpty(this.props.options)) {
-      this.props.getOptionValues();
-    }
+    this.props.getExpiryDates();
+    // if (_.isEmpty(this.props.options) && !_.isEmpty(this.props.expiryDates)) {
+    //   this.props.getOptionValues(this.props.expiryDates[0]);
+    // }
     window.addEventListener("beforeunload", this.handleWindowBeforeUnload);
     this.unmountProgressBar();
     this.props.refreshRef.current.addEventListener(
@@ -46,7 +49,7 @@ class OptionUptrend extends React.Component {
       const values = {
         mode: this.props.selectedTicker.mode,
         index: this.props.selectedTicker.index,
-        expiry: this.props.expiryDates[0],
+        expiry: this.props.selectedExpiry,
       };
       this.props.analyzeOptionChain({ ...values, data: this.props.data });
       this.props.getOptionChain(values.expiry, this.props.data);
@@ -149,7 +152,7 @@ class OptionUptrend extends React.Component {
             <table id="optionRankTable" style={{ display: 'none' }} className="ui celled table">
               <thead>
                 <tr>
-                  {this.props.sessions.map(session => <th>Session {+session.session - 1}</th>)}
+                  {this.props.sessions.map(session => <th>Session {new Date(session.time).toLocaleTimeString()}</th>)}
                 </tr>
               </thead>
               <tbody>
@@ -162,6 +165,70 @@ class OptionUptrend extends React.Component {
       </div>
     );
   };
+
+  onChangeExpiry = (e) => {
+    let expiry = e.target.value
+    this.props.selectExpiry(expiry)
+  }
+
+  onClickSubmit = (expiry) => {
+    this.props.resetOptionTrend();
+    let els = document.getElementsByClassName("optionLoader")
+    Array.from(els).forEach(el => el.style.display = '')
+    this.props.getOptionValues(expiry)
+  }
+
+  expiryDropdown = () => {
+    return <div className="segment">
+      {/* <div className="four column centered row"> */}
+      <div class="ui equal width grid">
+        <div className="row">
+          <div className="column">
+            Expiry
+          </div>
+          <div className="column">
+            {_.isEmpty(this.props.expiryDates) ? (
+              <div className="ui disabled dropdown">
+                Select <i className="dropdown icon"></i>
+                <div className="menu">
+                  <div className="item">Choice 1</div>
+                </div>
+              </div>
+            ) : (
+              <select
+                className="ui search dropdown"
+                onChange={
+                  // label === "Expiry"
+                  // ? (e) => this.onChangeExpiry(e, input)
+                  // : (e) => this.onChangeIndex(e, input)
+                  (e) => this.onChangeExpiry(e)
+                }
+                defaultValue={_.isEmpty(this.props.selectedExpiry) ? this.props.expiryDates[0] : this.props.selectedExpiry}
+              >
+                {this.props.expiryDates.map((expiryDates) => (
+                  <option key={expiryDates} value={expiryDates}>
+                    {expiryDates}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+          <div className="column">
+            <button
+              type="submit"
+              className={!this.props.progressBar.isProgressing?
+                "ui primary button":
+                "ui disabled button"
+              }
+              onClick={() => this.onClickSubmit(this.props.selectedExpiry)}
+            >
+              Go
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
   //table rows populate
   // populateRow = (options, header) => {
   //   options =
@@ -253,6 +320,7 @@ class OptionUptrend extends React.Component {
                 <input
                   type="checkbox"
                   name={`${header}PercentView`}
+                  // disabled={this.props.progressBar.isProgressing ? "disabled" : ""}
                   onClick={(e) => {
                     let percentViewEl = document.getElementById(`${header}PercentView`)
                     let liquidityViewEl = document.getElementById(`${header}LiquidityView`)
@@ -271,24 +339,17 @@ class OptionUptrend extends React.Component {
           </div>
           <div className="row">
             {_.isEmpty(options) ? (
-              <div className="ui active inverted dimmer centered inline loader">
+              <div className="ui active inverted dimmer centered inline loader optionLoader" style={{display: 'none' }}>
                 <div className="ui text loader">Loading</div>
               </div>
             ) : (
-              <div className="ui segments">
-                <div className="ui segment" style={{ width: "100%" }} id={`${header}LiquidityView`}>
+              <div className="ui segments" style={{ width: "100%" }}>
+                <div className="ui segment" id={`${header}LiquidityView`}>
                   <div className="ui ten column doubling grid">
                     {this.populateGridRow(options, header)}
                   </div>
                 </div>
-                <div className="ui segment" style={{ width: "100%", display: 'none' }} id={`${header}PercentView`} >
-                  {console.log(options.reduce((optionsGrade, option) => {
-                    let headerGrade = header === 'Call' ? option.options.calls.grade : option.options.puts.grade
-                    let grade = (optionsGrade[headerGrade] || [])
-                    grade.push(option)
-                    optionsGrade[headerGrade] = grade
-                    return optionsGrade
-                  }, {}))}
+                <div className="ui segment" style={{ display: 'none' }} id={`${header}PercentView`} >
                   {Object.keys(gradeOptions).map(grade => <div className="ui one column grid">
                     <div className="row"> Grade {grade}</div>
                     <div className="row">
@@ -307,6 +368,13 @@ class OptionUptrend extends React.Component {
       </div>
     );
   };
+
+  renderOptions =() =>{
+    return <div>
+    {this.populateOption(this.props.options, "Call")}
+    {this.populateOption(this.props.options, "Put") }
+    </div>
+  }
 
   render() {
     return (
@@ -343,8 +411,8 @@ class OptionUptrend extends React.Component {
         <div className="ui segment">
           <div className="ui segments">
             {this.rankOptions()}
-            {this.populateOption(this.props.options, "Call")}
-            {this.populateOption(this.props.options, "Put")}
+            {this.expiryDropdown()}
+            {this.renderOptions()}
           </div>
         </div>
       </div>
@@ -360,9 +428,10 @@ const mapStateToProps = (state) => {
   return {
     options: state.uptrend.options,
     progressBar: state.uptrend.progressBar,
-    expiryDates: state.uptrend.tickerData.expiryDates,
+    expiryDates: state.uptrend.expiryDates,
     data: state.uptrend.tickerData,
     selectedTicker: state.uptrend.selectedTicker,
+    selectedExpiry: state.uptrend.selectedExpiry,
     optionRankData: state.uptrend.optionRankData,
     sessions
   };
@@ -378,5 +447,7 @@ export default connect(mapStateToProps, {
   resetTicker,
   getOptionRank,
   unselectTicker,
-  resetProgress
+  resetProgress,
+  getExpiryDates,
+  selectExpiry
 })(OptionUptrend);

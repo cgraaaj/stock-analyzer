@@ -75,11 +75,12 @@ def get_uptrend():
 @analyze.route("/getContentLength", methods=["GET"])
 def get_content_length():
     current_app.logger.info(f"content length")
-    return "33000"
+    return "37000"
 
 
 @analyze.route("/options", methods=["GET"])
 def get_options():
+    expiry = request.args.get("expiry")
     current_app.logger.info(f"analyzing data")
     mode = "equities"
     tickers = (
@@ -91,7 +92,7 @@ def get_options():
     def generate():
         # for ticker in tickers[:10]:
         for ticker in tickers:
-            yield json.dumps(analyze_options_data(mode, ticker)) + "\n"
+            yield json.dumps(analyze_options_data(mode, ticker, expiry)) + "\n"
 
     # response.headers.add('content-length',26000)
     return current_app.response_class(generate(), mimetype="application/json")
@@ -113,12 +114,12 @@ def get_option_rank():
     return jsonify(res)
 
 # 25325
-def analyze_options_data(index, symbol):
+def analyze_options_data(index, symbol, expiry):
     url = nse.option_chain_url.format(index, quote(symbol))
     resp={}
     try:
         resp = get_nse_response(url)
-        resp = analyze_stock(resp["records"]["expiryDates"][0], resp["records"])
+        resp = analyze_stock(expiry, resp["records"])
         # pprint(resp)
         temp = {}
         temp["name"] = symbol
