@@ -29,7 +29,7 @@ class Home extends React.Component {
 
   onClickRefresh = () => {
     console.log(this.props);
-    this.props.fetchData(this.props.index, this.props.initialValues.index);
+    this.props.fetchData("HOME",this.props.index, this.props.initialValues.index);
   };
   onClickReset = () => {
     this.props.reset();

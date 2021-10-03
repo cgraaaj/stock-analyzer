@@ -32,7 +32,7 @@ const INTIAL_STATE = {
   tickerData: {},
   optionRankData: [],
   expiryDates:[],
-  selectedExpiry:""
+  selectedExpiry:"--Select--"
 };
 
 const setUptrendData = (data, dateObj, option) => {

@@ -21,7 +21,7 @@ class Header extends React.Component {
           Option Chain
         </NavLink>
         <NavLink activeClassName="is-active" to={`/uptrend`} className="item">
-          Uptrend
+          Trend
         </NavLink>
       </div>
     );

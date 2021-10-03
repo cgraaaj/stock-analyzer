@@ -60,7 +60,7 @@ class OptionUptrend extends React.Component {
   onClickRefresh = () => {
     this.props.resetTicker();
     this.props.resetOptionTrend();
-    this.props.getOptionValues();
+    this.props.getOptionValues(this.props.selectedExpiry);
     this.props.getOptionRank()
   };
 
@@ -182,7 +182,7 @@ class OptionUptrend extends React.Component {
     return <div className="segment">
       {/* <div className="four column centered row"> */}
       <div class="ui equal width grid">
-        <div className="row">
+        <div className="ui three column row">
           <div className="column">
             Expiry
           </div>
@@ -216,8 +216,8 @@ class OptionUptrend extends React.Component {
           <div className="column">
             <button
               type="submit"
-              className={!this.props.progressBar.isProgressing?
-                "ui primary button":
+              className={!this.props.progressBar.isProgressing && (this.props.selectedExpiry !== '--Select--') ?
+                "ui primary button" :
                 "ui disabled button"
               }
               onClick={() => this.onClickSubmit(this.props.selectedExpiry)}
@@ -339,7 +339,7 @@ class OptionUptrend extends React.Component {
           </div>
           <div className="row">
             {_.isEmpty(options) ? (
-              <div className="ui active inverted dimmer centered inline loader optionLoader" style={{display: 'none' }}>
+              <div className="ui active inverted dimmer centered inline loader optionLoader" style={{ display: 'none' }}>
                 <div className="ui text loader">Loading</div>
               </div>
             ) : (
@@ -369,10 +369,10 @@ class OptionUptrend extends React.Component {
     );
   };
 
-  renderOptions =() =>{
+  renderOptions = () => {
     return <div>
-    {this.populateOption(this.props.options, "Call")}
-    {this.populateOption(this.props.options, "Put") }
+      {this.populateOption(this.props.options, "Call")}
+      {this.populateOption(this.props.options, "Put")}
     </div>
   }
 

@@ -1,7 +1,8 @@
 from pymongo import MongoClient
+from pymongo.collection import Collection
 
 
-def get_database():
+def get_database() -> Collection:
     # Provide the mongodb atlas url to connect python to mongodb using pymongo
     CONNECTION_STRING = "mongodb+srv://velan_mongodb:Raju6713@cluster0.64cqd.mongodb.net/tradeStrategies?retryWrites=true&w=majority"
 

@@ -12,6 +12,7 @@ import time
 from dotenv import load_dotenv
 from nse.nse import nse
 from analyze.analyze import analyze
+from user.user import user
 
 
 # Flask constructor takes the name of
@@ -19,6 +20,9 @@ from analyze.analyze import analyze
 app = Flask(__name__)
 app.register_blueprint(nse, url_prefix="/nse")
 app.register_blueprint(analyze, url_prefix="/analyze")
+app.register_blueprint(user,url_prefix="/user")
+
+app.config["JWT_SECRET_KEY"] = "super-secret" 
 
 # logging
 logging.basicConfig(

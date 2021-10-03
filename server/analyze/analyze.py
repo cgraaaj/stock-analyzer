@@ -8,7 +8,6 @@ from flask import (
     current_app,
     send_from_directory,
     after_this_request,
-    jsonify,
     stream_with_context,
     Response,
 )
@@ -24,6 +23,7 @@ from analyze.get_db import get_database
 from nse.nse import get_nse_response
 from nse import nse
 from urllib.parse import quote
+from user.user import tokenRequired
 
 analyze = Blueprint("analyze", __name__)
 db = get_database()
@@ -73,6 +73,8 @@ def get_uptrend():
 
 
 @analyze.route("/getContentLength", methods=["GET"])
+# @tokenRequired
+# def get_content_length(current_user):
 def get_content_length():
     current_app.logger.info(f"content length")
     return "37000"
