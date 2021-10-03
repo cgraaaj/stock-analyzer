@@ -1,7 +1,6 @@
 import history from "../history";
 import { API } from "../utils/api";
-import {} from '../utils/constants'
-import axios from "axios";
+import { } from '../utils/constants'
 import {
   FETCH_DATA,
   RESET_FETCH_DATA,
@@ -28,9 +27,22 @@ import {
   GET_OPTION_RANK,
   UNSELECT_TICKER,
   SELECTED_EXPIRY,
-  GET_EXPIRY
+  GET_EXPIRY,
+  SIGN_IN,
+  SIGN_OUT
 } from "./types";
-import _ from "lodash";
+import _, { method } from "lodash";
+
+const onError = (dispatch,err)=>{
+  console.log(err.response.data)
+  if (err.response.status === 401) {
+    dispatch({
+      type: SIGN_OUT,
+      payload: {}
+    })
+    history.push('/login')
+  }
+}
 
 export const fetchData = (page, index, symbol) => async (dispatch) => {
   let response = "";
@@ -44,14 +56,13 @@ export const fetchData = (page, index, symbol) => async (dispatch) => {
     });
     console.log(response.data);
     response = response.data;
+    dispatch({
+      type: page === "UPTREND" ? FETCH_DATA_UPTREND : FETCH_DATA,
+      payload: { data: response },
+    });
   } catch (err) {
-    console.log(err);
-    response = err.response;
+    onError(dispatch,err)
   }
-  dispatch({
-    type: page === "UPTREND" ? FETCH_DATA_UPTREND : FETCH_DATA,
-    payload: { data: response },
-  });
 };
 
 export const resetFetchData = () => {
@@ -71,17 +82,21 @@ export const reset = () => {
 export const changeMode = (mode) => async (dispatch) => {
   let response = "";
   if (mode !== "INDEX") {
-    response = await API.get("/api/nse/equities");
-    console.log(response.data);
-    response = response.data;
+    try {
+      response = await API.get("/api/nse/equities");
+      console.log(response.data);
+      response = response.data;
+      dispatch({
+        type: CHANGE_MODE,
+        payload: {
+          mode,
+          data: response,
+        },
+      });
+    } catch (err) {
+      onError(dispatch,err)
+    }
   }
-  dispatch({
-    type: CHANGE_MODE,
-    payload: {
-      mode,
-      data: response,
-    },
-  });
 };
 
 export const analyzeOptionChain = (data) => {
@@ -111,14 +126,13 @@ export const getOptionChain = (expiry, data) => async (dispatch) => {
     });
     response = response.data;
     console.log(response);
+    dispatch({
+      type: GET_OPTION_CHAIN,
+      payload: { data: response },
+    });
   } catch (err) {
-    console.log(err);
-    response = err.response;
+    onError(dispatch,err)
   }
-  dispatch({
-    type: GET_OPTION_CHAIN,
-    payload: { data: response },
-  });
 };
 
 export const downloadData = (index, expiry, data) => async (dispatch) => {
@@ -132,14 +146,13 @@ export const downloadData = (index, expiry, data) => async (dispatch) => {
     });
     response = response.data;
     console.log(response);
+    dispatch({
+      type: DOWNLOAD_DATA,
+      payload: { data: response },
+    });
   } catch (err) {
-    console.log(err);
-    response = err.response;
+    onError(dispatch,err)
   }
-  dispatch({
-    type: DOWNLOAD_DATA,
-    payload: { data: response },
-  });
 };
 
 export const setFormValues = (formValues) => {
@@ -155,15 +168,13 @@ export const getUptrend = () => async (dispatch) => {
     response = await API.get(`/api/analyze/uptrend`);
     response = response.data;
     console.log(response);
+    dispatch({
+      type: UPTREND,
+      payload: response,
+    });
   } catch (err) {
-    console.log(err);
-    // err response should be handled on server
-    // response = err.response;
+    onError(dispatch,err)
   }
-  dispatch({
-    type: UPTREND,
-    payload: response,
-  });
 };
 
 export const changeOption = (value) => {
@@ -234,15 +245,14 @@ export const getOptionValues = (expiry) => async (dispatch) => {
     });
     // response = response.data
     // console.log(response)
+    dispatch({
+      type: SET_PROGRESS,
+      payload: { progress: 100, isProgressing: false, isComplete: true, isLoaded: true },
+    });
+    console.log("Final over");
   } catch (err) {
-    console.log(err);
-    response = err.response;
+    onError(dispatch,err)
   }
-  dispatch({
-    type: SET_PROGRESS,
-    payload: { progress: 100, isProgressing: false, isComplete: true,  isLoaded: true  },
-  });
-  console.log("Final over");
 };
 
 export const resetProgress = () => {
@@ -283,8 +293,8 @@ export const resetTicker = () => {
   };
 };
 
-export const getExpiryDates = () => async(dispatch) => {
-  let response =''
+export const getExpiryDates = () => async (dispatch) => {
+  let response = ''
   let index = 'equities'
   let symbol = 'RELIANCE'
   try {
@@ -296,14 +306,13 @@ export const getExpiryDates = () => async(dispatch) => {
     });
     console.log(response.data);
     response = response.data;
+    dispatch({
+      type: GET_EXPIRY,
+      payload: { data: response }
+    })
   } catch (err) {
-    console.log(err);
-    response = err.response;
+    onError(dispatch,err)
   }
-  dispatch({
-    type:GET_EXPIRY,
-    payload:{data:response}
-  })
 }
 
 export const getOptionRank = () => async (dispatch) => {
@@ -312,21 +321,53 @@ export const getOptionRank = () => async (dispatch) => {
     response = await API.get(`/api/analyze/getOptionRank`);
     response = response.data;
     console.log(response);
+    dispatch({
+      type: GET_OPTION_RANK,
+      payload: response
+    })
   } catch (err) {
-    console.log(err);
-    // err response should be handled on server
-    // response = err.response;
+    onError(dispatch,err)
   }
-  dispatch({
-    type:GET_OPTION_RANK,
-    payload:response
-  })
   // this.getOptionValues()
 }
 
-export const selectExpiry = (expiry)=>{
-  return{
-    type:SELECTED_EXPIRY,
-    payload:expiry
+export const selectExpiry = (expiry) => {
+  return {
+    type: SELECTED_EXPIRY,
+    payload: expiry
+  }
+}
+
+export const signIn = (credentials) => async (dispatch) => {
+  let response = "";
+  try {
+    response = await API.post("/api/login", {
+      username: credentials.username,
+      password: credentials.password
+    });
+    console.log(response)
+    dispatch({
+      type: SIGN_IN,
+      payload: {}
+    })
+    history.push('/')
+  }
+  catch (err) {
+    onError(dispatch,err)
+  }
+}
+
+export const signOut = () => async (dispatch) => {
+  let response = ""
+  try {
+    response = await API.post("/api/logout");
+    console.log(response)
+    dispatch({
+      type: SIGN_OUT,
+      payload: {}
+    })
+  }
+  catch (err) {
+    console.log(err)
   }
 }

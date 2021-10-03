@@ -33,3 +33,6 @@ export const RESET_PROGRESS= "RESET_PROGRESS"
 
 export const GET_EXPIRY = "GET_EXPIRY"
 export const SELECTED_EXPIRY= "SELECTED_EXPIRY"
+
+export const SIGN_IN = "SIGN_IN";
+export const SIGN_OUT = "SIGN_OUT";

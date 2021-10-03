@@ -1,5 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import {signOut} from "../actions"
+import { connect } from "react-redux";
 
 class Header extends React.Component {
   render() {
@@ -20,12 +22,27 @@ class Header extends React.Component {
         >
           Option Chain
         </NavLink>
-        <NavLink activeClassName="is-active" to={`/uptrend`} className="item">
+        <NavLink activeClassName="is-active" to={`/trend`} className="item">
           Trend
         </NavLink>
+        <div className="right menu">
+          <button className="ui button" onClick={()=>{
+            this.props.signOut()
+          }}>
+            Sign Out
+          </button>
+        </div>
       </div>
     );
   }
 }
+const mapStateToProps = (state) => {
+  return {
+    ...state
+  };
+};
 
-export default Header;
+export default connect(mapStateToProps, {
+signOut
+})(Header);
+

@@ -23,12 +23,13 @@ from analyze.get_db import get_database
 from nse.nse import get_nse_response
 from nse import nse
 from urllib.parse import quote
-from user.user import tokenRequired
+from flask_jwt_extended import jwt_required
 
 analyze = Blueprint("analyze", __name__)
 db = get_database()
 
 @analyze.route("/option-chain", methods=["POST"])
+@jwt_required()
 def option_chain():
     print(request.args.get("expiry"))
     expiry = request.args.get("expiry")
@@ -38,6 +39,7 @@ def option_chain():
 
 
 @analyze.route("/download/<path:index>", methods=["POST"])
+@jwt_required()
 def download(index):
     expiry = request.args.get("expiry")
     df = analyze_stock(expiry, request.json)
@@ -56,6 +58,7 @@ def download(index):
 
 
 @analyze.route("/uptrend", methods=["GET"])
+@jwt_required()
 def get_uptrend():
     current_app.logger.info(f"fetching data")
     collection = db["uptrend"]
@@ -73,14 +76,14 @@ def get_uptrend():
 
 
 @analyze.route("/getContentLength", methods=["GET"])
-# @tokenRequired
-# def get_content_length(current_user):
+@jwt_required()
 def get_content_length():
     current_app.logger.info(f"content length")
     return "37000"
 
 
 @analyze.route("/options", methods=["GET"])
+@jwt_required()
 def get_options():
     expiry = request.args.get("expiry")
     current_app.logger.info(f"analyzing data")
@@ -101,6 +104,7 @@ def get_options():
     # return current_app.response_class(stream_with_context(generate()))
 
 @analyze.route("/getOptionRank", methods=["GET"])
+@jwt_required()
 def get_option_rank():
     current_app.logger.info(f"fetching data")
     collection = db["rankOptions"]

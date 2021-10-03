@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from pandas.core.indexes import base
 import requests
 from urllib.parse import quote
+from flask_jwt_extended import jwt_required
 
 nse = Blueprint("nse", __name__)
 option_chain_url = "https://www.nseindia.com/api/option-chain-{}?symbol={}"
@@ -10,6 +11,7 @@ baseurl = "https://www.nseindia.com/"
 
 
 @nse.route("/option-chain")
+@jwt_required()
 def get_option_chain():
     index = request.args.get("index")
     symbol = request.args.get("symbol")
