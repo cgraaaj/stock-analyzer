@@ -326,6 +326,7 @@ export const getOptionRank = () => async (dispatch) => {
       payload: response
     })
   } catch (err) {
+    console.log(err)
     onError(dispatch,err)
   }
   // this.getOptionValues()

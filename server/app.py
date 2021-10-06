@@ -38,7 +38,8 @@ jwt = JWTManager(app)
 app.config["JWT_COOKIE_SECURE"] = False
 app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
 app.config["JWT_SECRET_KEY"] = "super-dooper-secret"
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(seconds=30)
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=3)
+app.config['JWT_COOKIE_CSRF_PROTECT'] = False 
 
 app.register_blueprint(nse, url_prefix="/nse")
 app.register_blueprint(analyze, url_prefix="/analyze")

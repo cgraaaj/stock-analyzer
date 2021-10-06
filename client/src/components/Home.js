@@ -2,6 +2,8 @@ import React from "react";
 import { connect } from "react-redux";
 import _ from "lodash";
 
+import OptionRank from "./Uptrend/OptionRank"
+
 import {
   fetchData,
   changeMode,
@@ -228,6 +230,7 @@ class Home extends React.Component {
               </div>
             </div>
           </div>
+          <OptionRank/>
         </div>
       </div>
     );

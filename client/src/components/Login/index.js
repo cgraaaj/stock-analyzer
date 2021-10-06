@@ -1,7 +1,10 @@
 import React from "react";
 import { connect } from "react-redux";
 import _ from "lodash";
-
+import Button from '@mui/material/Button';
+import {custTheme} from "../../utils/custMatUI"
+import { ThemeProvider } from "@mui/material/styles"
+import Checkbox from '@mui/material/Checkbox'
 import {
   signIn
 } from "../../actions";
@@ -35,7 +38,6 @@ class Login extends React.Component {
 
   validate = (formValues) => {
     const errors = {};
-    console.log("asdfsdfasdf")
     if (!formValues.username) {
       errors.word = "Username required";
     }
@@ -54,7 +56,7 @@ class Login extends React.Component {
             <label>{label}</label>
           </div>
         </div>
-        <div className="column" style={{width: "30%" }}>
+        <div className="column">
           <input {...input} autoComplete="off" type={label === 'Password' ? 'password' : null} id={label} />
         </div>
         {this.renderError(meta)}
@@ -63,7 +65,6 @@ class Login extends React.Component {
   };
 
   render() {
-    let tnc = React.createRef();
     return (
       <div>
         <div className="ui segments">
@@ -93,6 +94,7 @@ class Login extends React.Component {
                             this.exposeValues({ values })
                           }} /> */}
                         <div className="ui two column grid container">
+                        <ThemeProvider theme={custTheme}>
                           <Field
                             name="username"
                             component={this.renderInput}
@@ -106,48 +108,40 @@ class Login extends React.Component {
                           <div className="row">
                             <div className="column"></div>
                             <div className="column">
-                              <div class="ui checkbox">
-                                <input type="checkbox" name="showpass" onClick={(e) => {
+                            <Checkbox label="Show Password" onClick={(e) => {
                                   let passEl = document.getElementById("Password")
                                   if (e.target.checked) {
                                     passEl.type = "text"
                                   } else {
                                     passEl.type = "password"
                                   }
-                                }} />
+                                }}/>
                                 <label>Show password</label>
-                              </div>
                             </div>
                           </div>
                           <div className="row">
                             <div className="column">
                               <div className="ui right aligned container">
-                                <button
+                                <Button
                                   type="button"
-                                  className={
-                                    "ui secondary button"
-                                    //   ? "ui secondary button"
-                                    //   : "ui disabled button"
-                                  }
+                                  variant="contained"
+                                  color="secondary"
                                   onClick={this.onClickSignUp}
                                 >
                                   Sign Up
-                                </button>
+                                </Button>
                               </div>
                             </div>
                             <div className="column">
-                              <button
+                              <Button
                                 type="submit"
-                                className={
-                                  "ui primary button"
-                                    // ? "ui primary button"
-                                    // : "ui disabled button"
-                                }
+                                variant="contained"
                               >
                                 Sign In
-                              </button>
+                              </Button>
                             </div>
                           </div>
+                          </ThemeProvider>
                         </div>
                       </form>
                     )}
@@ -168,12 +162,20 @@ class Login extends React.Component {
             </p>
             <p>
               Investment in markets is subject to market risk.
-              Hence, <b>CGR Trades</b> are not
+              Hence, <b>CGR Trades</b> and <b>MC Holdings Pvt. Ltd</b> are not
               liable for any losses in any case. All our services are nonrefundable.
             </p>
-            <div class="ui slider checkbox" >
-              <input type="checkbox" name="tearmsnconditions" ref={tnc} />
-              <label>Accept terms and conditions</label>
+          </div>
+          <div className="ui segment">
+          <div className="ui one column centered grid">
+              <div className="row">
+              <audio id="scam" src="resource/rhtih.mp3"></audio>
+                <h4 style={{ margin: "10px" ,cursor: "pointer"}} onClick={()=>{
+                  document.getElementById("scam").play()
+                }}>
+                  "Risk hai toh ishq hai..." inspired from MCVenkie
+                </h4>
+              </div>
             </div>
           </div>
         </div>

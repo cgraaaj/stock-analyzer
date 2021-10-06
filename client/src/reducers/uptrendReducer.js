@@ -14,7 +14,8 @@ import {
   UNSELECT_TICKER,
   RESET_PROGRESS,
   SELECTED_EXPIRY,
-  GET_EXPIRY
+  GET_EXPIRY,
+  CHANGE_TAB
 } from "../actions/types";
 import _ from "lodash";
 
@@ -27,12 +28,13 @@ const INTIAL_STATE = {
   uptrendWithVolume: undefined,
   equityTrend: false,
   options: [],
-  progressBar: { progress: 0, isProgressing: false, isComplete: false, isLoaded:true },
+  progressBar: { progress: 0, isProgressing: false, isComplete: false, isLoaded: true },
   selectedTicker: {},
   tickerData: {},
   optionRankData: [],
-  expiryDates:[],
-  selectedExpiry:"--Select--"
+  expiryDates: [],
+  selectedExpiry: "--Select--",
+  optionRankTabData: { tab: 0, data: {} }
 };
 
 const setUptrendData = (data, dateObj, option) => {
@@ -97,7 +99,7 @@ const uptrendReducer = (state = INTIAL_STATE, action) => {
     case SET_PROGRESS:
       return { ...state, progressBar: action.payload };
     case RESET_PROGRESS:
-      return { ...state, progressBar:  {...state.progressBar, isLoaded:false}};
+      return { ...state, progressBar: { ...state.progressBar, isLoaded: false } };
     case RESET_OPTIONTREND:
       return {
         ...state,
@@ -117,7 +119,7 @@ const uptrendReducer = (state = INTIAL_STATE, action) => {
     case SELECTED_TICKER:
       return { ...state, selectedTicker: action.payload };
     case UNSELECT_TICKER:
-      return { ...state, selectedTicker: {...state.selectedTicker, selected:false} };
+      return { ...state, selectedTicker: { ...state.selectedTicker, selected: false } };
     case FETCH_DATA_UPTREND:
       return {
         ...state,
@@ -138,16 +140,21 @@ const uptrendReducer = (state = INTIAL_STATE, action) => {
       }
     case GET_EXPIRY:
       // console.log(action.payload.data.records.expiryDates)
-      let expiryDates= action.payload.data.records.expiryDates
+      let expiryDates = action.payload.data.records.expiryDates
       expiryDates.unshift("--Select--")
-      return{
+      return {
         ...state,
         expiryDates
       }
     case SELECTED_EXPIRY:
-      return{
+      return {
         ...state,
-        selectedExpiry:action.payload
+        selectedExpiry: action.payload
+      }
+    case CHANGE_TAB:
+      return {
+        ...state,
+        optionRankTabData: { ...state.optionRankTabData, tab: action.payload }
       }
     default:
       return state;

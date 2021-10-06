@@ -29,6 +29,7 @@ export const RESET_TICKERDATA = "RESET_TICKERDATA";
 export const RESET_TICKER = "RESET_TICKER";
 
 export const GET_OPTION_RANK = "GET_OPTION_RANK";
+export const CHANGE_TAB = "CHANGE_TAB"
 export const RESET_PROGRESS= "RESET_PROGRESS"
 
 export const GET_EXPIRY = "GET_EXPIRY"
