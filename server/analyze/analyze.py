@@ -17,6 +17,7 @@ import pymongo
 import json
 import time
 import math
+import pandas as pd
 
 from analyze.oiAnalyze import analyze_stock
 from analyze.get_db import get_database
@@ -27,6 +28,76 @@ from flask_jwt_extended import jwt_required
 
 analyze = Blueprint("analyze", __name__)
 db = get_database()
+currpath= os.path.dirname(os.path.abspath(__file__))
+
+nifty_auto = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxAuto"))['data']]
+nifty_bank = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("bankNifty"))['data']]
+nifty_energy = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxEnergy"))['data']]
+nifty_finance = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxFinance"))['data']]
+nifty_fmcg = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxFMCG"))['data']]
+nifty_it = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxit"))['data']]
+nifty_media = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxMedia"))['data']]
+nifty_metal = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxMetal"))['data']]
+nifty_pharma = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxPharma"))['data']]
+nifty_psu = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxPSU"))['data']]
+nifty_realty = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxRealty"))['data']]
+nifty_pvt_bank = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("niftyPvtBank"))['data']]
+
+sectors = [
+        {
+            "label": "Nifty Auto",
+            "value": nifty_auto
+        },
+        {
+            "label": "Nifty Bank",
+            "value": nifty_bank
+        },
+        {
+            "label": "Nifty Energy",
+            "value": nifty_energy
+        },
+        {
+            "label": "Nifty Financial Services",
+            "value": nifty_finance
+        },
+        {
+            "label": "Nifty FMCG",
+            "value": nifty_fmcg
+        },
+        {
+            "label": "Nifty IT",
+            "value": nifty_it
+        },
+        {
+            "label": "Nifty Media",
+            "value": nifty_media
+        },
+        {
+            "label": "Nifty Metal",
+            "value": nifty_metal
+        },
+        {
+            "label": "Nifty Pharma",
+            "value": nifty_pharma
+        },
+        {
+            "label": "Nifty PSU Bank",
+            "value": nifty_psu
+        },
+        {
+            "label": "Nifty Realty",
+            "value": nifty_realty
+        },
+        {
+            "label": "Nifty Private Bank",
+            "value": nifty_pvt_bank
+        },
+        {
+            "label": "",
+            "value": []
+        }
+    ]
+
 
 @analyze.route("/option-chain", methods=["POST"])
 @jwt_required()
@@ -91,12 +162,12 @@ def get_options():
     tickers = (
         ["NIFTY", "BANKNIFTY", "FINNIFTY"]
         if mode == "indices"
-        else get_nse_response(nse.equities_url)
+        else get_nse_response(nse.new_nse_url,nse.equities_url)
     )
 
     def generate():
-        # for ticker in tickers[:10]:
-        for ticker in tickers:
+        for ticker in tickers[:50]:
+        # for ticker in tickers:
             yield json.dumps(analyze_options_data(mode, ticker, expiry)) + "\n"
 
     # response.headers.add('content-length',26000)
@@ -119,12 +190,18 @@ def get_option_rank():
     current_app.logger.info(res)
     return jsonify(res)
 
+@analyze.route("/getSectors", methods=["GET"])
+@jwt_required()
+def get_sectors():
+    return ({"sectors":sectors})
+
+
 # 25325
 def analyze_options_data(index, symbol, expiry):
     url = nse.option_chain_url.format(index, quote(symbol))
     resp={}
     try:
-        resp = get_nse_response(url)
+        resp = get_nse_response(nse.new_nse_url,url)
         resp = analyze_stock(expiry, resp["records"])
         # pprint(resp)
         temp = {}
@@ -140,12 +217,14 @@ def analyze_options_data(index, symbol, expiry):
             temp["options"]["calls"]["percentage"] = 0
         else:
             temp["options"]["calls"]["percentage"] = math.ceil(((temp["options"]["calls"]["bullish"] - temp["options"]["calls"]["bearish"])/temp["options"]["calls"]["bullish"])*100)
-        if(temp["options"]["calls"]["percentage"]>85):
+        if(temp["options"]["calls"]["percentage"]==100):
             temp["options"]["calls"]["grade"] ="A"
-        elif(temp["options"]["calls"]["percentage"]>50 and temp["options"]["calls"]["percentage"]<=85):
+        elif(temp["options"]["calls"]["percentage"]>85 and temp["options"]["calls"]["percentage"]<100):
             temp["options"]["calls"]["grade"] ="B"
-        else:
+        elif(temp["options"]["calls"]["percentage"]>50 and temp["options"]["calls"]["percentage"]<=85):
             temp["options"]["calls"]["grade"] ="C"
+        else:
+            temp["options"]["calls"]["grade"] ="D"
         
         temp["options"]["puts"]["bullish"] = len(resp[resp["Put Trend"] == "Bullish"])
         temp["options"]["puts"]["bearish"] = len(resp[resp["Put Trend"] == "Bearish"])
@@ -153,12 +232,14 @@ def analyze_options_data(index, symbol, expiry):
             temp["options"]["puts"]["percentage"] = 0
         else:
             temp["options"]["puts"]["percentage"] = math.ceil(((temp["options"]["puts"]["bullish"] - temp["options"]["puts"]["bearish"])/temp["options"]["puts"]["bullish"])*100)
-        if(temp["options"]["puts"]["percentage"]>85):
+        if(temp["options"]["puts"]["percentage"]==100):
             temp["options"]["puts"]["grade"] ="A"
-        elif(temp["options"]["puts"]["percentage"]>50 and temp["options"]["puts"]["percentage"]<=85):
+        elif( temp["options"]["puts"]["percentage"]>85 and temp["options"]["puts"]["percentage"]<100):
             temp["options"]["puts"]["grade"] ="B"
-        else:
+        elif(temp["options"]["puts"]["percentage"]>50 and temp["options"]["puts"]["percentage"]<=85):
             temp["options"]["puts"]["grade"] ="C"
+        else:
+            temp["options"]["puts"]["grade"] ="D"
 
         temp["callTrend"] = (
             True
@@ -173,5 +254,5 @@ def analyze_options_data(index, symbol, expiry):
         return temp
     except Exception as e:
         # current_app.logger.info(symbol)
-        print(f"got Exception {e} on {symbol} the response is {resp}")
+        print(f"got Exception {e} on {symbol}")
 

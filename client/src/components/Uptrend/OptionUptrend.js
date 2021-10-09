@@ -14,14 +14,22 @@ import {
   unselectTicker,
   resetProgress,
   getExpiryDates,
-  selectExpiry
+  selectExpiry,
+  getSectors
 } from "../../actions";
+
+import { SELECT_SECTOR, CHANGE_TAB, DROPDOWN_INPUT_CHANGE } from "../../actions/types"
+
+import { Autocomplete, TextField, Select, MenuItem, FormControl, InputLabel } from "@mui/material"
+import { Tab, Tabs, Box } from '@mui/material';
+
 
 class OptionUptrend extends React.Component {
 
   componentDidMount() {
     // this.props.resetProgress()
     this.props.getExpiryDates();
+    this.props.getSectors()
     // if (_.isEmpty(this.props.options) && !_.isEmpty(this.props.expiryDates)) {
     //   this.props.getOptionValues(this.props.expiryDates[0]);
     // }
@@ -97,81 +105,60 @@ class OptionUptrend extends React.Component {
   expiryDropdown = () => {
     return <div className="segment">
       {/* <div className="four column centered row"> */}
-      <div class="ui equal width grid">
-        <div className="ui three column row">
-          <div className="column">
-            Expiry
-          </div>
-          <div className="column">
-            {_.isEmpty(this.props.expiryDates) ? (
-              <div className="ui disabled dropdown">
-                Select <i className="dropdown icon"></i>
-                <div className="menu">
-                  <div className="item">Choice 1</div>
-                </div>
+      <div class="ui one column grid">
+        <div className="ui two column row">
+          <div class="ui one column grid">
+            <div className="ui doubling three column row">
+              <div className="column">
+                Expiry
               </div>
-            ) : (
-              <select
-                className="ui search dropdown"
-                onChange={
-                  // label === "Expiry"
-                  // ? (e) => this.onChangeExpiry(e, input)
-                  // : (e) => this.onChangeIndex(e, input)
-                  (e) => this.onChangeExpiry(e)
-                }
-                defaultValue={_.isEmpty(this.props.selectedExpiry) ? this.props.expiryDates[0] : this.props.selectedExpiry}
-              >
-                {this.props.expiryDates.map((expiryDates) => (
-                  <option key={expiryDates} value={expiryDates}>
-                    {expiryDates}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-          <div className="column">
-            <button
-              type="submit"
-              className={!this.props.progressBar.isProgressing && (this.props.selectedExpiry !== '--Select--') ?
-                "ui primary button" :
-                "ui disabled button"
-              }
-              onClick={() => this.onClickSubmit(this.props.selectedExpiry)}
-            >
-              Go
-            </button>
+              <div className="column">
+                {_.isEmpty(this.props.expiryDates) ? (
+                  <FormControl sx={{ m: 1, minWidth: 80 }} disabled>
+                    <InputLabel id="demo-simple-select-label">Expiry</InputLabel>
+                    <Select
+                      labelId="expiry-select-label-disabled"
+                      id="expiry-select-id-disabled"
+                      value={this.props.selectedExpiry}
+                      label="Expiry"
+                      autoWidth
+                      onChange={this.onChangeExpiry}
+                    >{this.props.expiryDates.map((expiryDate) => <MenuItem value={expiryDate}>{expiryDate}</MenuItem>)}
+                    </Select>
+                  </FormControl>
+                ) : (
+                  <FormControl sx={{ m: 1, minWidth: 80 }}>
+                    <InputLabel id="demo-simple-select-label">Expiry</InputLabel>
+                    <Select
+                      labelId="expiry-select-label"
+                      id="expiry-select-id"
+                      value={this.props.selectedExpiry}
+                      label="Expiry"
+                      autoWidth
+                      onChange={this.onChangeExpiry}
+                    >{this.props.expiryDates.map((expiryDate) => <MenuItem value={expiryDate}>{expiryDate}</MenuItem>)}
+                    </Select>
+                  </FormControl>
+                )}
+              </div>
+              <div className="column">
+                <button
+                  type="submit"
+                  className={!this.props.progressBar.isProgressing && (this.props.selectedExpiry !== '--Select--') ?
+                    "ui primary button" :
+                    "ui disabled button"
+                  }
+                  onClick={() => this.onClickSubmit(this.props.selectedExpiry)}
+                >
+                  Go
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   }
-  //table rows populate
-  // populateRow = (options, header) => {
-  //   options =
-  //     header === "Call"
-  //       ? options.sort((a, b) => (a.callTrendDiff > b.callTrendDiff ? -1 : 1))
-  //       : options.sort((a, b) => (a.putTrendDiff > b.putTrendDiff ? -1 : 1));
-  //   let greenIndex = 100 / options.length;
-  //   return options.map((option, i) => (
-  //     <tr
-  //       style={{ backgroundColor: `rgb(0,${greenIndex * (i + 1) + 100},0)` }}
-  //       key={i}
-  //     >
-  //       <td
-  //         style={{ color: "white" }}
-  //         data-tooltip={
-  //           header === "Call"
-  //             ? `Bullish:${option.options.calls.bullish} Bearish:${option.options.calls.bearish} `
-  //             : `Bullish:${option.options.puts.bullish} Bearish:${option.options.puts.bearish}`
-  //         }
-  //         data-position="top center"
-  //         data-label={header}
-  //       >
-  //         {option.name}
-  //       </td>
-  //     </tr>
-  //   ));
-  // };
 
   populateGridRow = (options, header) => {
     options = options.filter((option) =>
@@ -182,36 +169,49 @@ class OptionUptrend extends React.Component {
         ? options.sort((a, b) => b.callTrendDiff - a.callTrendDiff)
         : options.sort((a, b) => b.putTrendDiff - a.putTrendDiff);
     let greenIndex = 100 / options.length;
-    return options.map((option, i) => (
-      <div
-        onClick={() => {
-          this.props.resetTicker();
-          this.props.fetchData("UPTREND", "equities", option.name);
-          const selectedTicker = { mode: "EQUITY", index: option.name, selected: true };
-          this.props.selectTicker(selectedTicker);
-        }}
-        style={{
-          color: "white",
-          backgroundColor: `rgb(0,${greenIndex * (i + 1) + 100},0)`,
-          cursor: "pointer",
-        }}
-        key={i}
-        data-tooltip={
-          header === "Call"
-            ? `Bullish:${option.options.calls.bullish} Bearish:${option.options.calls.bearish} `
-            : `Bullish:${option.options.puts.bullish} Bearish:${option.options.puts.bearish}`
-        }
-        data-position="top center"
-        data-label={header}
-        className="column"
-      >
-        <div className="row">{option.name}</div>
-        <div className="row">value%</div>
-      </div>
-    ));
+    return options.map((option, i) => {
+      let bullbearData = header === "Call"
+        ? { bullish: option.options.calls.bullish, bearish: option.options.calls.bearish }
+        : { bullish: option.options.puts.bullish, bearish: option.options.puts.bearish }
+      return (
+        <div
+          onClick={() => {
+            this.props.resetTicker();
+            this.props.fetchData("UPTREND", "equities", option.name);
+            const selectedTicker = { mode: "EQUITY", index: option.name, selected: true };
+            this.props.selectTicker(selectedTicker);
+          }}
+          style={{
+            // outline: bullbearData.bearish === 0? "1px solid #2185D0":null,
+            // outlineOffset: bullbearData.bearish === 0?"-1px":null,
+            // color: bullbearData.bearish === 0?"orange":"white",
+            color: "white",
+            backgroundColor: `rgb(0,${greenIndex * (i + 1) + 100},0)`,
+            cursor: "pointer",
+          }}
+          key={i}
+          data-tooltip={
+            `Bullish:${bullbearData.bullish} Bearish:${bullbearData.bearish} `
+          }
+          data-position="top center"
+          data-label={header}
+          className="column"
+        >
+          <div className="row">{option.name}</div>
+          <div className="row">value%</div>
+        </div>)
+    });
   };
 
   populateOption = (options, header) => {
+    // sector filter
+    if (!_.isEmpty(this.props.selectedSector)) {
+      const selectedSector = header === "Call" ? this.props.selectedSector.call : this.props.selectedSector.put
+      console.log(selectedSector)
+      options = !_.isEmpty(selectedSector.value) ?
+        options.filter(option => selectedSector.value.includes(option.name)) : options
+    }
+    // grade grouping
     let gradeOptions = options.reduce((optionsGrade, option) => {
       let headerGrade = header === 'Call' ? option.options.calls.grade : option.options.puts.grade
       let grade = (optionsGrade[headerGrade] || [])
@@ -227,7 +227,7 @@ class OptionUptrend extends React.Component {
     return (
       <div className="ui segment">
         <div className="ui one column grid">
-          <div className="two column equal width row">
+          <div className="doubling two column row">
             {/* <div classname="column">
             {header}
             </div> */}
@@ -251,6 +251,28 @@ class OptionUptrend extends React.Component {
                 />
                 <label>{header} Grade View</label>
               </div>
+            </div>
+            <div className="column">
+              <Autocomplete
+                options={this.props.sectors}
+                isOptionEqualToValue={(option, value) => option.label === value.label}
+                inputValue={this.props.tabData.tab === 0 ? this.props.selectedSector.call.input : this.props.selectedSector.put.input}
+                onInputChange={(event, newInputValue) => {
+                  console.log(newInputValue)
+                  this.props.onDDInputChange(header, newInputValue)
+                }}
+                value={this.props.tabData.tab === 0 ? this.props.selectedSector.call : this.props.selectedSector.put}
+                onChange={(event, newValue) => {
+                  if (!_.isEmpty(newValue)) {
+                    this.props.onSelectSector(header, newValue)
+                  } else {
+                    this.props.onSelectSector(header, { label: '', value: [] })
+                  }
+                }}
+                id={header}
+                sx={{ width: 300 }}
+                renderInput={(params) => <TextField {...params} label="Sectors" />}
+              />
             </div>
           </div>
           <div className="row">
@@ -285,11 +307,36 @@ class OptionUptrend extends React.Component {
     );
   };
 
+  handleTabs = (e, value) => {
+    this.props.onTabClick(value)
+  }
+
+  renderTabPanel = () => {
+    return (<div>
+      {
+        this.props.tabData.tab === 0 ?
+          this.populateOption(this.props.options, "Call") :
+          this.populateOption(this.props.options, "Put")
+      }
+    </div>)
+  }
+
   renderOptions = () => {
-    return <div>
-      {this.populateOption(this.props.options, "Call")}
-      {this.populateOption(this.props.options, "Put")}
-    </div>
+    return !_.isEmpty(this.props.options) ? <Box sx={{ width: '100%' }}>
+      {/* print pe ratio */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={this.props.tabData.tab} onChange={this.handleTabs} aria-label="basic tabs example">
+          <Tab label="Call" />
+          <Tab label="Put" />
+        </Tabs>
+      </Box>
+      {this.renderTabPanel()}
+    </Box> : null
+
+    // return <div>
+    //   {this.populateOption(this.props.options, "Call")}
+    //   {this.populateOption(this.props.options, "Put")}
+    // </div>
   }
 
   render() {
@@ -335,6 +382,30 @@ class OptionUptrend extends React.Component {
   }
 }
 
+const onSelectSector = (tab, payload) => {
+  return {
+    type: SELECT_SECTOR,
+    tab,
+    payload
+  }
+}
+
+const onDDInputChange = (tab, payload) => {
+  return {
+    type: DROPDOWN_INPUT_CHANGE,
+    tab,
+    payload
+  }
+}
+
+const onTabClick = (payload) => {
+  return {
+    type: CHANGE_TAB,
+    component: "UPTREND",
+    payload
+  }
+}
+
 const mapStateToProps = (state) => {
   return {
     options: state.uptrend.options,
@@ -344,6 +415,9 @@ const mapStateToProps = (state) => {
     selectedTicker: state.uptrend.selectedTicker,
     selectedExpiry: state.uptrend.selectedExpiry,
     optionRankData: state.uptrend.optionRankData,
+    sectors: state.uptrend.sectors,
+    selectedSector: state.uptrend.selectedSector,
+    tabData: state.uptrend.optionUptrendTabData,
   };
 };
 
@@ -359,5 +433,9 @@ export default connect(mapStateToProps, {
   unselectTicker,
   resetProgress,
   getExpiryDates,
-  selectExpiry
+  selectExpiry,
+  getSectors,
+  onSelectSector,
+  onTabClick,
+  onDDInputChange
 })(OptionUptrend);

@@ -37,3 +37,7 @@ export const SELECTED_EXPIRY= "SELECTED_EXPIRY"
 
 export const SIGN_IN = "SIGN_IN";
 export const SIGN_OUT = "SIGN_OUT";
+
+export const GET_SECTORS = "GET_SECTORS";
+export const SELECT_SECTOR ="SELECT_SECTOR"
+export const DROPDOWN_INPUT_CHANGE ="DROPDOWN_INPUT_CHANGE"

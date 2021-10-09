@@ -29,11 +29,14 @@ import {
   SELECTED_EXPIRY,
   GET_EXPIRY,
   SIGN_IN,
-  SIGN_OUT
+  SIGN_OUT,
+  GET_SECTORS
 } from "./types";
 import _, { method } from "lodash";
 
 const onError = (dispatch,err)=>{
+  console.log(err)
+  if(err.response){
   console.log(err.response.data)
   if (err.response.status === 401) {
     dispatch({
@@ -42,6 +45,7 @@ const onError = (dispatch,err)=>{
     })
     history.push('/login')
   }
+}
 }
 
 export const fetchData = (page, index, symbol) => async (dispatch) => {
@@ -295,15 +299,8 @@ export const resetTicker = () => {
 
 export const getExpiryDates = () => async (dispatch) => {
   let response = ''
-  let index = 'equities'
-  let symbol = 'RELIANCE'
   try {
-    response = await API.get("/api/nse/option-chain", {
-      params: {
-        index,
-        symbol,
-      },
-    });
+    response = await API.get("/api/nse/getOptionExpiries");
     console.log(response.data);
     response = response.data;
     dispatch({
@@ -366,6 +363,20 @@ export const signOut = () => async (dispatch) => {
     dispatch({
       type: SIGN_OUT,
       payload: {}
+    })
+  }
+  catch (err) {
+    console.log(err)
+  }
+}
+
+export const getSectors = () => async (dispatch) => {
+  try {
+    const response = await API.get("/api/analyze/getSectors")
+    console.log(response)
+    dispatch({
+      type: GET_SECTORS,
+      payload: {data:response.data}
     })
   }
   catch (err) {

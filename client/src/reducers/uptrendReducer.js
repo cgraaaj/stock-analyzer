@@ -15,7 +15,10 @@ import {
   RESET_PROGRESS,
   SELECTED_EXPIRY,
   GET_EXPIRY,
-  CHANGE_TAB
+  CHANGE_TAB,
+  GET_SECTORS,
+  SELECT_SECTOR,
+  DROPDOWN_INPUT_CHANGE
 } from "../actions/types";
 import _ from "lodash";
 
@@ -34,7 +37,11 @@ const INTIAL_STATE = {
   optionRankData: [],
   expiryDates: [],
   selectedExpiry: "--Select--",
-  optionRankTabData: { tab: 0, data: {} }
+  optionRankTabData: { tab: 0, data: {} },
+  optionUptrendTabData: { tab: 0, data: {} },
+  sectors: [],
+  selectedSector: { call: { label: '', value: [] }, put: { label: '', value: [] } },
+  dropdownInputChange:{call:'',put:''}
 };
 
 const setUptrendData = (data, dateObj, option) => {
@@ -139,8 +146,8 @@ const uptrendReducer = (state = INTIAL_STATE, action) => {
         optionRankData
       }
     case GET_EXPIRY:
-      // console.log(action.payload.data.records.expiryDates)
-      let expiryDates = action.payload.data.records.expiryDates
+      console.log(action.payload.data.expiryDates)
+      let expiryDates = action.payload.data.expiryDates
       expiryDates.unshift("--Select--")
       return {
         ...state,
@@ -152,9 +159,32 @@ const uptrendReducer = (state = INTIAL_STATE, action) => {
         selectedExpiry: action.payload
       }
     case CHANGE_TAB:
+      if (action.component === "RANK") {
+        return {
+          ...state,
+          optionRankTabData: { ...state.optionRankTabData, tab: action.payload }
+        }
+      }
       return {
         ...state,
-        optionRankTabData: { ...state.optionRankTabData, tab: action.payload }
+        optionUptrendTabData: { ...state.optionUptrendTabData, tab: action.payload }
+      }
+    case GET_SECTORS:
+      return {
+        ...state,
+        sectors: action.payload.data.sectors
+      }
+    case SELECT_SECTOR:
+      state.selectedSector[action.tab.toLowerCase()] = { ...state.selectedSector[action.tab.toLowerCase()], ...action.payload }
+      return {
+        ...state,
+        selectedSector: { ...state.selectedSector }
+      }
+    case DROPDOWN_INPUT_CHANGE:
+      state.dropdownInputChange[action.tab.toLowerCase()] = action.payload
+      return {
+        ...state,
+        dropdownInputChange: { ...state.dropdownInputChange }
       }
     default:
       return state;
