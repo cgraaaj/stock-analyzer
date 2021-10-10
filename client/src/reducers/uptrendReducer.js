@@ -18,7 +18,8 @@ import {
   CHANGE_TAB,
   GET_SECTORS,
   SELECT_SECTOR,
-  DROPDOWN_INPUT_CHANGE
+  DROPDOWN_INPUT_CHANGE,
+  SELECT_PERIOD
 } from "../actions/types";
 import _ from "lodash";
 
@@ -41,7 +42,8 @@ const INTIAL_STATE = {
   optionUptrendTabData: { tab: 0, data: {} },
   sectors: [],
   selectedSector: { call: { label: '', value: [] }, put: { label: '', value: [] } },
-  dropdownInputChange:{call:'',put:''}
+  dropdownInputChange:{call:'',put:''},
+  selectedPeriod:'30min'
 };
 
 const setUptrendData = (data, dateObj, option) => {
@@ -140,7 +142,7 @@ const uptrendReducer = (state = INTIAL_STATE, action) => {
         selectedTicker: INTIAL_STATE.selectedTicker,
       };
     case GET_OPTION_RANK:
-      let optionRankData = action.payload[0]
+      let optionRankData = action.payload
       return {
         ...state,
         optionRankData
@@ -185,6 +187,11 @@ const uptrendReducer = (state = INTIAL_STATE, action) => {
       return {
         ...state,
         dropdownInputChange: { ...state.dropdownInputChange }
+      }
+    case SELECT_PERIOD:
+      return{
+        ...state,
+        selectedPeriod:action.payload
       }
     default:
       return state;

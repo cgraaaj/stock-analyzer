@@ -20,7 +20,7 @@ import {
 
 import { SELECT_SECTOR, CHANGE_TAB, DROPDOWN_INPUT_CHANGE } from "../../actions/types"
 
-import { Autocomplete, TextField, Select, MenuItem, FormControl, InputLabel } from "@mui/material"
+import { Autocomplete, TextField, Select, MenuItem, FormControl, InputLabel, Button, LinearProgress } from "@mui/material"
 import { Tab, Tabs, Box } from '@mui/material';
 
 
@@ -97,8 +97,8 @@ class OptionUptrend extends React.Component {
 
   onClickSubmit = (expiry) => {
     this.props.resetOptionTrend();
-    let els = document.getElementsByClassName("optionLoader")
-    Array.from(els).forEach(el => el.style.display = '')
+    let el = document.getElementById("mui-progress-bar")
+    el.style.display = ''
     this.props.getOptionValues(expiry)
   }
 
@@ -108,10 +108,7 @@ class OptionUptrend extends React.Component {
       <div class="ui one column grid">
         <div className="ui two column row">
           <div class="ui one column grid">
-            <div className="ui doubling three column row">
-              <div className="column">
-                Expiry
-              </div>
+            <div className="ui doubling two column row">
               <div className="column">
                 {_.isEmpty(this.props.expiryDates) ? (
                   <FormControl sx={{ m: 1, minWidth: 80 }} disabled>
@@ -142,16 +139,13 @@ class OptionUptrend extends React.Component {
                 )}
               </div>
               <div className="column">
-                <button
-                  type="submit"
-                  className={!this.props.progressBar.isProgressing && (this.props.selectedExpiry !== '--Select--') ?
-                    "ui primary button" :
-                    "ui disabled button"
-                  }
+                <Button
+                  disabled={!(!this.props.progressBar.isProgressing && (this.props.selectedExpiry !== '--Select--'))}
+                  variant="contained"
                   onClick={() => this.onClickSubmit(this.props.selectedExpiry)}
                 >
                   Go
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -276,31 +270,25 @@ class OptionUptrend extends React.Component {
             </div>
           </div>
           <div className="row">
-            {_.isEmpty(options) ? (
-              <div className="ui active inverted dimmer centered inline loader optionLoader" style={{ display: 'none' }}>
-                <div className="ui text loader">Loading</div>
-              </div>
-            ) : (
-              <div className="ui segments" style={{ width: "100%" }}>
-                <div className="ui segment" id={`${header}LiquidityView`}>
-                  <div className="ui ten column doubling grid">
-                    {this.populateGridRow(options, header)}
-                  </div>
+            <div className="ui segments" style={{ width: "100%" }}>
+              <div className="ui segment" id={`${header}LiquidityView`}>
+                <div className="ui ten column doubling grid">
+                  {this.populateGridRow(options, header)}
                 </div>
-                <div className="ui segment" style={{ display: 'none' }} id={`${header}PercentView`} >
-                  {Object.keys(gradeOptions).map(grade => <div className="ui one column grid">
-                    <div className="row"> Grade {grade}</div>
-                    <div className="row">
-                      <div className="ui segment" style={{ width: "100%" }}>
-                        <div className="ui ten column doubling grid">
-                          {this.populateGridRow(gradeOptions[grade], header)}
-                        </div>
+              </div>
+              <div className="ui segment" style={{ display: 'none' }} id={`${header}PercentView`} >
+                {Object.keys(gradeOptions).map(grade => <div className="ui one column grid">
+                  <div className="row"> Grade {grade}</div>
+                  <div className="row">
+                    <div className="ui segment" style={{ width: "100%" }}>
+                      <div className="ui ten column doubling grid">
+                        {this.populateGridRow(gradeOptions[grade], header)}
                       </div>
                     </div>
-                  </div>)}
-                </div>
+                  </div>
+                </div>)}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
@@ -312,6 +300,8 @@ class OptionUptrend extends React.Component {
   }
 
   renderTabPanel = () => {
+    let el = document.getElementById("mui-progress-bar")
+    el.style.display = 'none'
     return (<div>
       {
         this.props.tabData.tab === 0 ?
@@ -322,16 +312,19 @@ class OptionUptrend extends React.Component {
   }
 
   renderOptions = () => {
-    return !_.isEmpty(this.props.options) ? <Box sx={{ width: '100%' }}>
+    return <Box sx={{ width: '100%' }}>
       {/* print pe ratio */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={this.props.tabData.tab} onChange={this.handleTabs} aria-label="basic tabs example">
-          <Tab label="Call" />
-          <Tab label="Put" />
+        <Tabs value={this.props.tabData.tab} onChange={this.handleTabs} aria-label="basic tabs example" >
+          <Tab label="Call" disabled ={_.isEmpty(this.props.options)}/>
+          <Tab label="Put" disabled ={_.isEmpty(this.props.options)}/>
         </Tabs>
       </Box>
-      {this.renderTabPanel()}
-    </Box> : null
+      {!_.isEmpty(this.props.options)
+        ? this.renderTabPanel()
+        : null}
+        <LinearProgress id="mui-progress-bar" style={{ display: 'none' }} />
+    </Box>
 
     // return <div>
     //   {this.populateOption(this.props.options, "Call")}

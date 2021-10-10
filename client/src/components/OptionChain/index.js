@@ -41,6 +41,7 @@ class OptionChain extends React.Component {
     OCTableData["underlyingValue"] = this.props.underlyingValue;
     OCTableData["timeStamp"] = this.props.timeStamp;
     OCTableData["data"] = this.props.OCTable;
+    OCTableData["selectedExpiry"] = this.props.selectedExpiry;
     console.log(OCTableData);
     sessionStorage.setItem("tableData", JSON.stringify(OCTableData));
     // let subDomain = /:\/\/([^\/]+)/.exec(window.location.href)[0];

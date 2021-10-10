@@ -22,7 +22,7 @@ class OptionChainTable extends React.Component {
     let headers = Object.keys(this.props.tableData);
     let rows = Object.keys(this.props.tableData[headers[0]]);
     return (
-      <div className="ui container">
+      <div style={{ marginTop: "10px"}}>
         <div className="ui segments">
           <div className="ui segment">
             <div className="ui two column centered grid">
@@ -31,6 +31,11 @@ class OptionChainTable extends React.Component {
                 {this.props.underlyingValue} as on {this.props.timeStamp}
               </h4>
             </div>
+            <div className="ui two column centered grid">
+              <h5 style={{ margin: "10px" , fontStyle:"italic"}}>
+                  Currently Viewing {this.props.selectedExpiry} Expiry
+                </h5>
+                </div>
           </div>
           <div className="ui segment">
             <div style={{ height: "550px", overflow: "auto" }}>
@@ -66,6 +71,7 @@ const mapStateToProps = (state) => {
     index: tableData.index,
     underlyingValue: tableData.underlyingValue,
     timeStamp: tableData.timeStamp,
+    selectedExpiry: tableData.selectedExpiry,
   };
 };
 

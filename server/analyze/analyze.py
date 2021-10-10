@@ -177,6 +177,7 @@ def get_options():
 @analyze.route("/getOptionRank", methods=["GET"])
 @jwt_required()
 def get_option_rank():
+    sessions={'5min':[],'15min':[],'30min':[],'60min':[]}
     current_app.logger.info(f"fetching data")
     collection = db["rankOptions"]
     res = list(
@@ -186,9 +187,17 @@ def get_option_rank():
             limit=1,
             sort=[("_id", pymongo.DESCENDING)],
         )
-    )
-    current_app.logger.info(res)
-    return jsonify(res)
+    )[0]
+    # sessions['5min'] = res['sessions']
+    # sessions['15min'] = res['sessions'][3:len(res['sessions']):3]
+    # sessions['30min'] = res['sessions'][6:len(res['sessions']):6]
+    # sessions['60min'] = res['sessions'][6:len(res['sessions']):12]
+    sessions['5min'] = []
+    sessions['15min'] = []
+    sessions['30min'] = res['sessions']
+    sessions['60min'] = res['sessions'][1:len(res['sessions']):2]
+    # current_app.logger.info(sessions)
+    return jsonify({"date":res['date'],"sessions":sessions})
 
 @analyze.route("/getSectors", methods=["GET"])
 @jwt_required()
@@ -196,7 +205,6 @@ def get_sectors():
     return ({"sectors":sectors})
 
 
-# 25325
 def analyze_options_data(index, symbol, expiry):
     url = nse.option_chain_url.format(index, quote(symbol))
     resp={}

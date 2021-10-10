@@ -3,8 +3,8 @@ import { Router, Route } from "react-router-dom";
 
 import Home from "./Home";
 import OptionChain from "./OptionChain";
-import OptionChainTable from "./OptionChain/OptionChainTable";
 import Uptrend from "./Uptrend";
+import OptionChainTable from "./OptionChain/OptionChainTable";
 import Header from "./Header";
 import history from "../history";
 import Login from '../components/Login'
