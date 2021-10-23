@@ -9,12 +9,11 @@ import {
   resetEquityTrend,
 } from "../../actions";
 
-class OptionChain extends React.Component {
+class EODAnalysis extends React.Component {
   componentDidMount() {
     if (_.isEmpty(this.props.data)) {
       this.props.getUptrend();
     }
-    // this.props.refreshRef.current.addEventListener("click", this.onClickRefresh)
   }
   componentDidUpdate() {
     if (!_.isEmpty(this.props.selectedDate)) {
@@ -174,4 +173,4 @@ export default connect(mapStateToProps, {
   changeDate,
   changeOption,
   resetEquityTrend,
-})(OptionChain);
+})(EODAnalysis);

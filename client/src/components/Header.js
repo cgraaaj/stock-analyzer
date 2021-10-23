@@ -5,7 +5,6 @@ import { connect } from "react-redux";
 
 class Header extends React.Component {
   render() {
-    console.log(window.location.pathname)
     return (
       window.location.pathname === '/stock-analyzer/option_chain_table' ? null :
         <div className="ui secondary  menu">
@@ -24,15 +23,23 @@ class Header extends React.Component {
           >
             Option Chain
           </NavLink>
-          <NavLink activeClassName="is-active" to={`/trend`} className="item">
-            Trend
+          <NavLink activeClassName="is-active" to={`/option_trend`} className="item">
+            Option Trend
+          </NavLink>
+          <NavLink activeClassName="is-active" to={`/equity_trend`} className="item">
+            Equity Trend
           </NavLink>
           <div className="right menu">
-            <button className="ui button" onClick={() => {
-              this.props.signOut()
-            }}>
-              Sign Out
-            </button>
+            <div className="item">
+              <text>{`Hey, ${this.props.user.username}`}</text>
+            </div>
+            <div className="item">
+              <button className="ui button" onClick={() => {
+                this.props.signOut()
+              }}>
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
     );
@@ -40,7 +47,7 @@ class Header extends React.Component {
 }
 const mapStateToProps = (state) => {
   return {
-    ...state
+    user: state.auth
   };
 };
 

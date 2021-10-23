@@ -19,8 +19,10 @@ import time
 import math
 import pandas as pd
 
+# from rankOptions import analyze_options_data
 from analyze.oiAnalyze import analyze_stock
 from analyze.get_db import get_database
+from analyze.rankOptions import rankOptions
 from nse.nse import get_nse_response
 from nse import nse
 from urllib.parse import quote
@@ -106,7 +108,7 @@ def option_chain():
     expiry = request.args.get("expiry")
     current_app.logger.info(f"analyzing data")
     df = analyze_stock(expiry, request.json)
-    return df.to_json()
+    return df.to_json(orient='records')
 
 
 @analyze.route("/download/<path:index>", methods=["POST"])
@@ -166,8 +168,8 @@ def get_options():
     )
 
     def generate():
-        for ticker in tickers[:50]:
-        # for ticker in tickers:
+        # for ticker in tickers[:10]:
+        for ticker in tickers:
             yield json.dumps(analyze_options_data(mode, ticker, expiry)) + "\n"
 
     # response.headers.add('content-length',26000)
@@ -264,3 +266,8 @@ def analyze_options_data(index, symbol, expiry):
         # current_app.logger.info(symbol)
         print(f"got Exception {e} on {symbol}")
 
+def analyze_option_trend():
+    optionTrend = rankOptions.OptionTrend()
+    optionTrend.get_option_trend("equities")
+    optionTrend.save()
+    return optionTrend.get_result()

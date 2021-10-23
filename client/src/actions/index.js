@@ -1,6 +1,8 @@
 import history from "../history";
+import jwtDecode from 'jwt-decode';
 import { API } from "../utils/api";
 import { } from '../utils/constants'
+
 import {
   FETCH_DATA,
   RESET_FETCH_DATA,
@@ -247,8 +249,6 @@ export const getOptionValues = (expiry) => async (dispatch) => {
         });
       },
     });
-    // response = response.data
-    // console.log(response)
     dispatch({
       type: SET_PROGRESS,
       payload: { progress: 100, isProgressing: false, isComplete: true, isLoaded: true },
@@ -343,10 +343,17 @@ export const signIn = (credentials) => async (dispatch) => {
       username: credentials.username,
       password: credentials.password
     });
-    console.log(response)
+    console.log(response.data)
+    const accessToken = response.data.access_token
+    //get user details from user api
+    const {username,is_admin} = jwtDecode(accessToken)
+    const payload={
+      username,
+      isAdmin:is_admin
+    }
     dispatch({
       type: SIGN_IN,
-      payload: {}
+      payload
     })
     history.push('/')
   }

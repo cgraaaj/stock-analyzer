@@ -6,6 +6,8 @@ from flask.json import jsonify
 from flask_cors import CORS
 from waitress import serve
 from flask_jwt_extended import JWTManager
+import asyncio
+import websockets
 from analyze.get_db import get_database
 import requests
 import os
@@ -18,7 +20,7 @@ from datetime import datetime,timedelta, timezone
 from dotenv import load_dotenv
 from werkzeug.security import check_password_hash
 from nse.nse import nse
-from analyze.analyze import analyze
+from analyze.analyze import analyze,analyze_option_trend
 from user.user import user
 
 from flask_jwt_extended import create_access_token
@@ -115,8 +117,8 @@ def login():
             {"WWWAuthenticate": 'Basic realm="Login required!"'},
         )
     if check_password_hash(user["password"], data['password']):
-        response = jsonify({"msg": "login successful"})
-        access_token = create_access_token(identity=data['username'],additional_claims={'is_admin':user['is_admin']})
+        access_token = create_access_token(identity=data['username'],additional_claims={'username':data['username'],'is_admin':user['is_admin']})
+        response = jsonify({"msg": "login successful","access_token":access_token})
         set_access_cookies(response, access_token)
         return response
     return make_response(
@@ -131,6 +133,18 @@ def logout():
     unset_jwt_cookies(response)
     return response
 
+# async def analyze_options(websocket:websockets, path):
+#     print("hit")
+#     now = datetime.now()
+#     minutes = 5
+#     start = now.replace(hour=9,minute=15)
+#     end = now.replace(hour=15,minute=30)
+#     while now>start and now<end:
+#         result = analyze_option_trend()
+#         await websocket.send(result)
+#         await asyncio.sleep(minutes*60)
+#     await websocket.send("asdf")
+
 
 # main driver function
 if __name__ == "__main__":
@@ -139,8 +153,19 @@ if __name__ == "__main__":
     load_dotenv("{}/.env".format(LOCATE_PY_DIRECTORY_PATH))
     # run() method of Flask class runs the application
     # on the local development server.
-    port = 5000
+    port= 5000
+    ws_port = 5123
+    ws_host = '0.0.0.0'
+
+    # loop = asyncio.new_event_loop()
+    # asyncio.set_event_loop(loop)
+    # start_server = websockets.serve(analyze_options, ws_host, ws_port)
+    # print(f"Server Starting at {ws_host} {ws_port}")
+
     if os.getenv("FLASK_ENV") == "development":
         app.run(port=port, host="0.0.0.0", debug=True)
     else:
         serve(app, host="0.0.0.0", port=port)
+
+    # asyncio.get_event_loop().run_until_complete(start_server)
+    # asyncio.get_event_loop().run_forever()

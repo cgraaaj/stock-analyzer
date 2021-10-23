@@ -33,7 +33,7 @@ export default class Chart extends PureComponent {
           <Tooltip />
           <Legend />
           <Bar dataKey="CE" fill="#8884d8" />
-          <Bar dataKey="PE" fill="#82ca9d" />
+          <Bar dataKey="PE" fill="#f59542" />
         </BarChart>
       </ResponsiveContainer>
     );

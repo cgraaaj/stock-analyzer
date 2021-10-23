@@ -8,6 +8,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import _ from "lodash"
 
 
 export const custTheme = createTheme({
@@ -38,49 +39,42 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const createData = (tab,session) => {
-let tabData = tab === 0? session.options.call:session.options.put
-let sessionTime = new Date(session.time).toLocaleTimeString()
-console.log(sessionTime)
-let rank1 = tabData[0].name
-let rank2 = tabData[1].name
-let rank3 = tabData[2].name
-let rank4 = tabData[3].name
-let rank5 = tabData[4].name
-  return { sessionTime,rank1,rank2,rank3,rank4,rank5 };
-}
-
-const getRows = (tab,sessions) => {
-  console.log(sessions)
-  return sessions.map(session=>createData(tab,session))
+const getRows = (tab, sessions) => {
+  let rows = []
+  for (let i = 0; i < 5; i++) {
+    let columns = {}
+    let rank = `Rank ${i + 1}`
+    sessions.forEach((session, j) => {
+      let tabData = tab === 0 ? session.options.call : session.options.put
+      if(!_.isEmpty(tabData)){
+      columns[`session${j + 1}`] = tabData[i].name
+      }
+    })
+    columns['rank'] = rank
+    rows.push(columns)
+  }
+  console.log(rows)
+  return rows
 };
 
-export const CustomizedTables = (tab,sessions) => {
-  let rows = getRows(tab,sessions)
+export const CustomizedTables = (tab, sessions) => {
+  let rows = getRows(tab, sessions)
   return (
-    <TableContainer component={Paper} style={{ maxHeight: 300 }}>
+    <TableContainer component={Paper} style={{ maxHeight: 320 }}>
       <Table sx={{ minWidth: 700 }} aria-label="customized table" stickyHeader>
         <TableHead>
           <TableRow>
-            <StyledTableCell>Sessions</StyledTableCell>
-            <StyledTableCell align="right">Rank 1</StyledTableCell>
-            <StyledTableCell align="right">Rank 2</StyledTableCell>
-            <StyledTableCell align="right">Rank 3</StyledTableCell>
-            <StyledTableCell align="right">Rank 4</StyledTableCell>
-            <StyledTableCell align="right">Rank 5</StyledTableCell>
+            <StyledTableCell>Rank</StyledTableCell>
+            {sessions.map(session => <StyledTableCell align="left">{new Date(new Date(session.time).getTime()+19800000).toLocaleTimeString()}</StyledTableCell>)}
           </TableRow>
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <StyledTableRow key={row.sessionTime}>
+            <StyledTableRow key={row.rank}>
               <StyledTableCell component="th" scope="row">
-                {row.sessionTime}
+                {row.rank}
               </StyledTableCell>
-              <StyledTableCell align="right">{row.rank1}</StyledTableCell>
-              <StyledTableCell align="right">{row.rank2}</StyledTableCell>
-              <StyledTableCell align="right">{row.rank3}</StyledTableCell>
-              <StyledTableCell align="right">{row.rank4}</StyledTableCell>
-              <StyledTableCell align="right">{row.rank5}</StyledTableCell>
+              {Object.values(row).map((session, i) => i !== Object.values(row).length - 1 ? <StyledTableCell style={{color:tab ===0?"#8884d8":"#f59542"}} align="left">{session}</StyledTableCell> : null)}
             </StyledTableRow>
           ))}
         </TableBody>

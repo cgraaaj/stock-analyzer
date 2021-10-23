@@ -19,7 +19,9 @@ import {
   GET_SECTORS,
   SELECT_SECTOR,
   DROPDOWN_INPUT_CHANGE,
-  SELECT_PERIOD
+  SELECT_PERIOD,
+  CHECK_GRADE,
+  SET_FETCH_MANUAL
 } from "../actions/types";
 import _ from "lodash";
 
@@ -39,11 +41,12 @@ const INTIAL_STATE = {
   expiryDates: [],
   selectedExpiry: "--Select--",
   optionRankTabData: { tab: 0, data: {} },
-  optionUptrendTabData: { tab: 0, data: {} },
+  optionUptrendTabData: { tab: 0, data: {}, grade:{call:false,put:false}},
   sectors: [],
   selectedSector: { call: { label: '', value: [] }, put: { label: '', value: [] } },
   dropdownInputChange:{call:'',put:''},
-  selectedPeriod:'30min'
+  selectedPeriod:'30min',
+  isFetchManual:false
 };
 
 const setUptrendData = (data, dateObj, option) => {
@@ -171,6 +174,12 @@ const uptrendReducer = (state = INTIAL_STATE, action) => {
         ...state,
         optionUptrendTabData: { ...state.optionUptrendTabData, tab: action.payload }
       }
+    case CHECK_GRADE:
+      state.optionUptrendTabData.grade[action.header.toLowerCase()]= action.payload
+      return{
+        ...state,
+        optionUptrendTabData:{...state.optionUptrendTabData, grade:{...state.optionUptrendTabData.grade}}
+      }
     case GET_SECTORS:
       return {
         ...state,
@@ -192,6 +201,11 @@ const uptrendReducer = (state = INTIAL_STATE, action) => {
       return{
         ...state,
         selectedPeriod:action.payload
+      }
+    case SET_FETCH_MANUAL:
+      return{
+        ...state,
+        isFetchManual:action.payload
       }
     default:
       return state;
