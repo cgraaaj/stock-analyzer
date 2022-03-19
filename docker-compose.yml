@@ -23,3 +23,11 @@ services:
     environment: 
       - FLASK_ENV=production
     restart: always
+  websocket:
+    build:
+      context: ./ws_server
+    volumes:
+      - ./ws_server:/app
+    # environment: 
+    #   - FLASK_ENV=production
+    restart: always
