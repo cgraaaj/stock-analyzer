@@ -9,7 +9,7 @@ class Ws extends React.Component {
     // instance of websocket connection as a class property
     // socket = io(`http://192.168.1.76:3213`);
     websocket = () => {
-        const ws = new WebSocket(`ws://${window.location.host}/ws`)
+        const ws = new WebSocket(`wss://${window.location.host}/ws`)
         ws.onopen = () => {
             // on connecting, do nothing but log it to the console
             console.log('connected')
