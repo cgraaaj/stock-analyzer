@@ -18,7 +18,8 @@ class App extends React.Component {
   render() {
     return (
       <div className="ui container" style={{ width: "98%" }}>
-        <Router history={history} basename={"/stock-analyzer"}>
+        {/* <Router history={history} basename={"/stock-analyzer"}> */}
+        <Router history={history}>
           {/* <Router history={history}> */}
           {this.props.isSignedIn ? <div>
             <Ws/>
