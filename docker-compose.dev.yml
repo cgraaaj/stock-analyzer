@@ -1,0 +1,35 @@
+version: '3.7'
+services:
+  nginx_dev:
+    restart: always
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - '3051:80'
+      - '5123:5123'
+    depends_on:
+      - api_dev
+      - client_dev
+
+  client_dev:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      - /home/node/app/node_modules
+      - /home/node/app/nginx
+      - ./client:/home/node/app
+    depends_on:
+      - api_dev
+    restart: always
+
+  api_dev:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./server
+    volumes:
+      - ./server:/app
+    environment: 
+      - FLASK_ENV=development
+    restart: always

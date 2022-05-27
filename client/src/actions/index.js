@@ -1,8 +1,11 @@
 import history from "../history";
-// import { API } from "../utils/api";
-import axios from "axios";
+import jwtDecode from 'jwt-decode';
+import { API } from "../utils/api";
+import * as constants from '../utils/constants'
+import _, { method } from "lodash";
 import {
   FETCH_DATA,
+  RESET_FETCH_DATA,
   CHANGE_MODE,
   ANALYZE_OPTIONS,
   SET_MODAL,
@@ -13,62 +16,103 @@ import {
   UPTREND,
   CHANGE_OPTION,
   CHANGE_DATE,
-  RESET
+  RESET,
+  EQUITY_TREND,
+  GET_OPTION_VALUES,
+  SET_PROGRESS,
+  RESET_PROGRESS,
+  RESET_OPTIONTREND,
+  RESET_EQUITYTREND,
+  SELECTED_TICKER,
+  FETCH_DATA_UPTREND,
+  RESET_TICKER,
+  GET_OPTION_RANK,
+  UNSELECT_TICKER,
+  SELECTED_EXPIRY,
+  GET_EXPIRY,
+  SIGN_IN,
+  SIGN_OUT,
+  GET_SECTORS
 } from "./types";
 
-export const fetchData = (index, symbol) => async (dispatch) => {
+
+const onError = (dispatch, err) => {
+  console.log(err)
+  if (err.response) {
+    console.log(err.response.data)
+    if (err.response.status === 401) {
+      dispatch({
+        type: SIGN_OUT,
+        payload: {}
+      })
+      history.push('/login')
+    }
+  }
+}
+
+export const fetchData = (page, index, symbol) => async (dispatch) => {
   let response = "";
-  console.log(index, symbol)
+  console.log(index, symbol);
   try {
-    response = await axios.get('/api/nse/option-chain', {
+    response = await API.get(`${constants.FETCH_DATA_API}`, {
       params: {
         index,
-        symbol
-      }
-    })
-    console.log(response.data)
-    response = response.data
+        symbol,
+      },
+    });
+    console.log(response.data);
+    response = response.data;
+    dispatch({
+      type: page === "UPTREND" ? FETCH_DATA_UPTREND : FETCH_DATA,
+      payload: { data: response },
+    });
   } catch (err) {
-    console.log(err)
-    response = err.response;
+    onError(dispatch, err)
   }
-  dispatch({
-    type: FETCH_DATA,
-    payload: { data: response },
-  });
+};
+
+export const resetFetchData = () => {
+  return {
+    type: RESET_FETCH_DATA,
+    payload: {},
+  };
 };
 
 export const reset = () => {
   return {
-    type:RESET,
-    payload:{}
-  }
-}
+    type: RESET,
+    payload: {},
+  };
+};
 
 export const changeMode = (mode) => async (dispatch) => {
   let response = "";
-  if (mode !== 'INDEX') {
-    response = await axios.get('/api/nse/equities')
-    console.log(response.data)
-    response = response.data
-  }
-  dispatch({
-    type: CHANGE_MODE,
-    payload: {
-      mode,
-      data: response
+  if (mode !== "INDEX") {
+    try {
+      response = await API.get(`${constants.CHANGE_MODE_API}`);
+      console.log(response.data);
+      response = response.data;
+      dispatch({
+        type: CHANGE_MODE,
+        payload: {
+          mode,
+          data: response,
+        },
+      });
+    } catch (err) {
+      onError(dispatch, err)
     }
-  })
-}
+  }
+};
 
 export const analyzeOptionChain = (data) => {
-  console.log(data)
-  history.push("/oc_analyze")
+  console.log(data);
+  history.push("/oc_analyze");
   return {
     type: ANALYZE_OPTIONS,
-    payload: data
-  }
-}
+    payload: data,
+  };
+};
 
 export const setModal = (modal) => {
   return {
@@ -79,44 +123,42 @@ export const setModal = (modal) => {
 
 export const getOptionChain = (expiry, data) => async (dispatch) => {
   let response = "";
-  console.log(expiry, data)
+  console.log(expiry, data);
   try {
-    response = await axios.post(`/api/analyze/option-chain`, data, {
+    response = await API.post(`${constants.GET_OPTION_CHAIN_API}`, data, {
       params: {
-        expiry
-      }
-    })
-    response = response.data
-    console.log(response)
+        expiry,
+      },
+    });
+    response = response.data;
+    console.log(response);
+    dispatch({
+      type: GET_OPTION_CHAIN,
+      payload: { data: response },
+    });
   } catch (err) {
-    console.log(err)
-    response = err.response;
+    onError(dispatch, err)
   }
-  dispatch({
-    type: GET_OPTION_CHAIN,
-    payload: { data: response },
-  });
 };
 
-export const downloadData = (index,expiry, data) => async (dispatch) => {
+export const downloadData = (index, expiry, data) => async (dispatch) => {
   let response = "";
-  console.log(index, data)
+  console.log(index, data);
   try {
-    response = await axios.post(`/api/analyze/download/${index}`, data,{
+    response = await API.post(`${constants.DOWNLOAD_DATA_API}/${index}`, data, {
       params: {
-        expiry
-      }
-    })
-    response = response.data
-    console.log(response)
+        expiry,
+      },
+    });
+    response = response.data;
+    console.log(response);
+    dispatch({
+      type: DOWNLOAD_DATA,
+      payload: { data: response },
+    });
   } catch (err) {
-    console.log(err)
-    response = err.response;
+    onError(dispatch, err)
   }
-  dispatch({
-    type: DOWNLOAD_DATA,
-    payload: { data: response },
-  });
 };
 
 export const setFormValues = (formValues) => {
@@ -124,22 +166,21 @@ export const setFormValues = (formValues) => {
     type: SET_FORM_VALUES,
     payload: { ...formValues },
   };
-}
+};
 
 export const getUptrend = () => async (dispatch) => {
   let response = "";
   try {
-    response = await axios.get(`/api/analyze/uptrend`)
-    response = response.data
-    console.log(response)
+    response = await API.get(`${constants.GET_UPTREND_API}`);
+    response = response.data;
+    console.log(response);
+    dispatch({
+      type: UPTREND,
+      payload: response,
+    });
   } catch (err) {
-    console.log(err)
-    response = err.response;
+    onError(dispatch, err)
   }
-  dispatch({
-    type: UPTREND,
-    payload: response,
-  });
 };
 
 export const changeOption = (value) => {
@@ -147,13 +188,205 @@ export const changeOption = (value) => {
     type: CHANGE_OPTION,
     payload: value,
   };
-}
+};
 
 export const changeDate = (date) => {
-  console.log(date)
+  console.log(date);
   return {
     type: CHANGE_DATE,
-    payload: date
+    payload: date,
+  };
+};
+
+export const checkOptionTrend = (value) => {
+  return {
+    type: EQUITY_TREND,
+    payload: value,
+  };
+};
+
+function IsJsonString(str) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
+
+export const getOptionValues = (expiry) => async (dispatch) => {
+  let response = "";
+  try {
+    let contentLength = await API.get(`${constants.GET_CONTENT_LENGTH_API}`);
+    response = await API.get(`${constants.GET_OPTION_VALUES_API}`, {
+      params: {
+        expiry
+      },
+      onDownloadProgress: (progressEvent) => {
+        const chunk = progressEvent.currentTarget.response;
+        let res = [];
+        chunk
+          .split("\n")
+          .forEach((obj) =>
+            IsJsonString(obj) ? res.push(JSON.parse(obj)) : {}
+          );
+        let percentCompleted = Math.floor(
+          (progressEvent.loaded / parseInt(contentLength.data)) * 100
+        );
+        console.log("completed: ", percentCompleted);
+        dispatch({
+          type: GET_OPTION_VALUES,
+          payload: _.compact(res),
+        });
+        dispatch({
+          type: SET_PROGRESS,
+          payload: {
+            progress: percentCompleted,
+            isProgressing: true,
+            isComplete: false,
+            isLoaded: true
+          },
+        });
+      },
+    });
+    dispatch({
+      type: SET_PROGRESS,
+      payload: { progress: 100, isProgressing: false, isComplete: true, isLoaded: true },
+    });
+    console.log("Final over");
+  } catch (err) {
+    onError(dispatch, err)
+  }
+};
+
+export const resetProgress = () => {
+  return {
+    type: RESET_PROGRESS,
+  };
+};
+
+export const resetOptionTrend = () => {
+  return {
+    type: RESET_OPTIONTREND,
+  };
+};
+
+export const resetEquityTrend = () => {
+  return {
+    type: RESET_EQUITYTREND,
+  };
+};
+
+export const selectTicker = (data) => {
+  return {
+    type: SELECTED_TICKER,
+    payload: data,
+  };
+};
+
+export const unselectTicker = () => {
+  return {
+    type: UNSELECT_TICKER,
+    payload: {}
+  };
+};
+
+export const resetTicker = () => {
+  return {
+    type: RESET_TICKER,
+  };
+};
+
+export const getExpiryDates = () => async (dispatch) => {
+  let response = ''
+  try {
+    response = await API.get(`${constants.GET_EXPIRY_DATES_API}`);
+    console.log(response.data);
+    response = response.data;
+    dispatch({
+      type: GET_EXPIRY,
+      payload: { data: response }
+    })
+  } catch (err) {
+    onError(dispatch, err)
   }
 }
 
+export const getOptionRank = () => async (dispatch) => {
+  let response = "";
+  try {
+    response = await API.get(`${constants.GET_OPTION_RANK_API}`);
+    response = response.data;
+    console.log(response);
+    dispatch({
+      type: GET_OPTION_RANK,
+      payload: response
+    })
+  } catch (err) {
+    console.log(err)
+    onError(dispatch, err)
+  }
+  // this.getOptionValues()
+}
+
+export const selectExpiry = (expiry) => {
+  return {
+    type: SELECTED_EXPIRY,
+    payload: expiry
+  }
+}
+
+export const signIn = (credentials) => async (dispatch) => {
+  let response = "";
+  try {
+    response = await API.post(`${constants.SIGN_IN_API}`, {
+      username: credentials.username,
+      password: credentials.password
+    });
+    console.log(response.data)
+    const accessToken = response.data.access_token
+    //get user details from user api
+    const { username, is_admin } = jwtDecode(accessToken)
+    const payload = {
+      username,
+      isAdmin: is_admin
+    }
+    dispatch({
+      type: SIGN_IN,
+      payload
+    })
+    history.push('/')
+  }
+  catch (err) {
+    onError(dispatch, err)
+  }
+}
+
+export const signOut = () => async (dispatch) => {
+  let response = ""
+  try {
+    response = await API.post(`${constants.SIGN_OUT_API}`);
+    console.log(response)
+    dispatch({
+      type: SIGN_OUT,
+      payload: {}
+    })
+  }
+  catch (err) {
+    console.log(err)
+  }
+}
+
+export const getSectors = () => async (dispatch) => {
+  try {
+    const response = await API.get(`${constants.GET_SECTORS_API}`)
+    console.log(response)
+    dispatch({
+      type: GET_SECTORS,
+      payload: { data: response.data }
+    })
+  }
+  catch (err) {
+    console.log(err)
+  }
+}

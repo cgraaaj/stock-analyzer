@@ -8,3 +8,7 @@ pymongo
 pymongo[srv]
 python-dotenv
 requests
+PyJWT
+flask-jwt-extended
+websockets
+flask-socketio

@@ -2,11 +2,20 @@ import React from "react";
 import { connect } from "react-redux";
 import _ from "lodash";
 
-import { fetchData, changeMode, analyzeOptionChain, setFormValues, getOptionChain,reset } from "../actions";
+import OptionRank from "./Uptrend/OptionRank"
+
+import {
+  fetchData,
+  changeMode,
+  analyzeOptionChain,
+  setFormValues,
+  getOptionChain,
+  reset,
+  resetFetchData,
+} from "../actions";
 import { Form, Field, FormSpy } from "react-final-form";
 
 class Home extends React.Component {
-
   // componentDidMount() {
   //   this.props.fetchData(this.props.index, this.props.symbol);
   // }
@@ -16,17 +25,17 @@ class Home extends React.Component {
   onFormSubmit = (values) => {
     console.log(values);
     this.props.analyzeOptionChain({ ...values, data: this.props.data });
-    this.props.getOptionChain(values.expiry, this.props.data)
-    this.props.setFormValues(values)
+    this.props.getOptionChain(values.expiry, this.props.data);
+    this.props.setFormValues(values);
   };
 
   onClickRefresh = () => {
-    console.log(this.props)
-    this.props.fetchData(this.props.index, this.props.initialValues.index);
-  }
+    console.log(this.props);
+    this.props.fetchData("HOME",this.props.index, this.props.initialValues.index);
+  };
   onClickReset = () => {
     this.props.reset();
-  }
+  };
 
   renderError({ error, touched }) {
     if (touched && error) {
@@ -49,7 +58,10 @@ class Home extends React.Component {
   onChangeIndex = (event, input) => {
     console.log(event.target.value);
     input.onChange(event.target.value);
-    if (event.target.value) { this.props.fetchData(this.props.index, event.target.value) }
+    this.props.resetFetchData();
+    if (event.target.value) {
+      this.props.fetchData("HOME", this.props.index, event.target.value);
+    }
   };
 
   onChangeExpiry = (event, input) => {
@@ -71,7 +83,7 @@ class Home extends React.Component {
             className="ui button"
             onClick={() => {
               if (input.value === "INDEX") {
-                this.props.changeMode("STOCK");
+                this.props.changeMode("EQUITY");
               } else {
                 this.props.changeMode("INDEX");
               }
@@ -93,7 +105,7 @@ class Home extends React.Component {
             <label>{label}</label>
           </div>
         </div>
-        <div className="column">
+        <div className="column" style={{ width: "50%" }}>
           {_.isEmpty(options) ? (
             <div className="ui disabled dropdown">
               Select <i className="dropdown icon"></i>
@@ -125,17 +137,23 @@ class Home extends React.Component {
 
   render() {
     return (
-      <div className="ui container">
+      <div>
         <div className="ui segments">
           <div className="ui segment">
             <div className="ui one column centered grid">
-            <div className="row">
-              <h4 style={{margin:"10px"}}>Data fetched at: {this.props.refreshedAt ? this.props.refreshedAt : '--'}</h4>
-              {this.props.initialValues.expiry? 
-              <i className="sync icon" onClick={this.onClickRefresh} style={{cursor:"pointer",margin:"10px"}}>
-              </i>
-              :null}
-            </div>
+              <div className="row">
+                <h4 style={{ margin: "10px" }}>
+                  Data fetched at:{" "}
+                  {this.props.refreshedAt ? this.props.refreshedAt : "--"}
+                </h4>
+                {this.props.initialValues.expiry ? (
+                  <i
+                    className="sync icon"
+                    onClick={this.onClickRefresh}
+                    style={{ cursor: "pointer", margin: "10px" }}
+                  ></i>
+                ) : null}
+              </div>
             </div>
           </div>
           <div className="ui segment">
@@ -147,7 +165,7 @@ class Home extends React.Component {
                     // subscription={{values:{...this.props}}}
                     initialValues={this.props.initialValues}
                     // validate={this.validate}
-                    render={({ handleSubmit, values }) => (  
+                    render={({ handleSubmit, values }) => (
                       <form className="ui form error" onSubmit={handleSubmit}>
                         {/* <FormSpy
                           subscription={{ values: true }}
@@ -156,7 +174,11 @@ class Home extends React.Component {
                             this.exposeValues({ values })
                           }} /> */}
                         <div className="ui two column grid container">
-                          <Field name="mode" component={this.renderButton} label="Mode" />
+                          <Field
+                            name="mode"
+                            component={this.renderButton}
+                            label="Mode"
+                          />
                           <Field
                             name="index"
                             component={this.renderList}
@@ -173,28 +195,30 @@ class Home extends React.Component {
                             <div className="column">
                               <div className="ui right aligned container">
                                 <button
-                                  type="submit"
+                                  type="button"
                                   className={
-                                    values.hasOwnProperty("expiry") &&
-                                      !_.isEmpty(values.expiry)
-                                      ? "ui primary button" : "ui disabled button"
+                                    values.hasOwnProperty("index") &&
+                                      !_.isEmpty(values.index)
+                                      ? "ui secondary button"
+                                      : "ui disabled button"
                                   }
+                                  onClick={this.onClickReset}
                                 >
-                                  Submit
+                                  Reset
                                 </button>
                               </div>
                             </div>
                             <div className="column">
                               <button
-                                type="button"
+                                type="submit"
                                 className={
-                                  values.hasOwnProperty("index") &&
-                                    !_.isEmpty(values.index)
-                                    ? "ui secondary button" : "ui disabled button"
+                                  values.hasOwnProperty("expiry") &&
+                                    !_.isEmpty(values.expiry)
+                                    ? "ui primary button"
+                                    : "ui disabled button"
                                 }
-                                onClick={this.onClickReset}
                               >
-                                Reset
+                                Submit
                               </button>
                             </div>
                           </div>
@@ -206,6 +230,7 @@ class Home extends React.Component {
               </div>
             </div>
           </div>
+          <OptionRank/>
         </div>
       </div>
     );
@@ -215,7 +240,11 @@ class Home extends React.Component {
 const mapStateToProps = (state) => {
   console.log(state.conf.formValues);
   return {
-    initialValues: { mode: state.conf.formValues.mode, index: state.conf.formValues.index, expiry: state.conf.formValues.expiry },
+    initialValues: {
+      mode: state.conf.formValues.mode,
+      index: state.conf.formValues.index,
+      expiry: state.conf.formValues.expiry,
+    },
     label: state.conf.label,
     indexList: state.conf.indexList,
     index: state.conf.index,
@@ -230,5 +259,7 @@ export default connect(mapStateToProps, {
   changeMode,
   analyzeOptionChain,
   setFormValues,
-  getOptionChain,reset
+  getOptionChain,
+  reset,
+  resetFetchData,
 })(Home);

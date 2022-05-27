@@ -1,8 +1,16 @@
-import React, { PureComponent } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import React, { PureComponent } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 export default class Chart extends PureComponent {
-
   render() {
     return (
       <ResponsiveContainer width="100%" height="100%">
@@ -21,11 +29,11 @@ export default class Chart extends PureComponent {
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="strikePrice" />
-          <YAxis/>
+          <YAxis />
           <Tooltip />
           <Legend />
           <Bar dataKey="CE" fill="#8884d8" />
-          <Bar dataKey="PE" fill="#82ca9d" />
+          <Bar dataKey="PE" fill="#f59542" />
         </BarChart>
       </ResponsiveContainer>
     );

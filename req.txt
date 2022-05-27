@@ -1,0 +1,15 @@
+home
+    option rank should be moved to homepage
+        call and put must be in tab view
+        row and column should be interchagned
+    Stock occupation in a session
+    
+Opchain 
+    should be opened in new tab for every view
+
+Trend
+    call and put trend must be on tab view
+    socket
+    show peer stocks on call, put trend
+    equit Trend
+        index non-index name change later on

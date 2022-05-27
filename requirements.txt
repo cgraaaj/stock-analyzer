@@ -1,0 +1,11 @@
+eventlet
+flask
+websockets
+aiohttp
+pandas
+pymongo
+#server
+flask_cors
+waitress
+flask_jwt_extended
+python-dotenv

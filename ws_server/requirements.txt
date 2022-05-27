@@ -1,0 +1,7 @@
+eventlet
+flask
+websockets
+aiohttp
+pandas
+pymongo
+requests
