@@ -5,22 +5,21 @@ class OptionChainTable extends React.Component {
     sessionStorage.removeItem("tableData");
   }
 
-  renderData = (data, row) => {
-    let headers = Object.keys(data);
+  renderData = (rowData) => {
+    let headers = Object.keys(rowData);
     return headers.map((header, i) => (
       <td key={i} data-label={header}>
-        {data[header][row]}
+        {rowData[header]}
       </td>
     ));
   };
 
-  renderRows = (data, rows) => {
-    return rows.map((row, i) => <tr key={i}>{this.renderData(data, i)}</tr>);
+  renderRows = (data) => {
+    return data.map((row, i) => <tr key={i}>{this.renderData(row)}</tr>);
   };
 
   render() {
-    let headers = Object.keys(this.props.tableData);
-    let rows = Object.keys(this.props.tableData[headers[0]]);
+    let headers = Object.keys(this.props.tableData[0]);
     return (
       <div style={{ marginTop: "10px"}}>
         <div className="ui segments">
@@ -54,7 +53,7 @@ class OptionChainTable extends React.Component {
                     ))}
                   </tr>
                 </thead>
-                <tbody>{this.renderRows(this.props.tableData, rows)}</tbody>
+                <tbody>{this.renderRows(this.props.tableData)}</tbody>
               </table>
             </div>
           </div>

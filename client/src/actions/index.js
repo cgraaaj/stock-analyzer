@@ -1,8 +1,8 @@
 import history from "../history";
 import jwtDecode from 'jwt-decode';
 import { API } from "../utils/api";
-import { } from '../utils/constants'
-
+import * as constants from '../utils/constants'
+import _, { method } from "lodash";
 import {
   FETCH_DATA,
   RESET_FETCH_DATA,
@@ -34,27 +34,27 @@ import {
   SIGN_OUT,
   GET_SECTORS
 } from "./types";
-import _, { method } from "lodash";
 
-const onError = (dispatch,err)=>{
+
+const onError = (dispatch, err) => {
   console.log(err)
-  if(err.response){
-  console.log(err.response.data)
-  if (err.response.status === 401) {
-    dispatch({
-      type: SIGN_OUT,
-      payload: {}
-    })
-    history.push('/login')
+  if (err.response) {
+    console.log(err.response.data)
+    if (err.response.status === 401) {
+      dispatch({
+        type: SIGN_OUT,
+        payload: {}
+      })
+      history.push('/login')
+    }
   }
-}
 }
 
 export const fetchData = (page, index, symbol) => async (dispatch) => {
   let response = "";
   console.log(index, symbol);
   try {
-    response = await API.get("/api/nse/option-chain", {
+    response = await API.get(`${constants.FETCH_DATA_API}`, {
       params: {
         index,
         symbol,
@@ -67,7 +67,7 @@ export const fetchData = (page, index, symbol) => async (dispatch) => {
       payload: { data: response },
     });
   } catch (err) {
-    onError(dispatch,err)
+    onError(dispatch, err)
   }
 };
 
@@ -89,7 +89,7 @@ export const changeMode = (mode) => async (dispatch) => {
   let response = "";
   if (mode !== "INDEX") {
     try {
-      response = await API.get("/api/nse/equities");
+      response = await API.get(`${constants.CHANGE_MODE_API}`);
       console.log(response.data);
       response = response.data;
       dispatch({
@@ -100,7 +100,7 @@ export const changeMode = (mode) => async (dispatch) => {
         },
       });
     } catch (err) {
-      onError(dispatch,err)
+      onError(dispatch, err)
     }
   }
 };
@@ -125,7 +125,7 @@ export const getOptionChain = (expiry, data) => async (dispatch) => {
   let response = "";
   console.log(expiry, data);
   try {
-    response = await API.post(`/api/analyze/option-chain`, data, {
+    response = await API.post(`${constants.GET_OPTION_CHAIN_API}`, data, {
       params: {
         expiry,
       },
@@ -137,7 +137,7 @@ export const getOptionChain = (expiry, data) => async (dispatch) => {
       payload: { data: response },
     });
   } catch (err) {
-    onError(dispatch,err)
+    onError(dispatch, err)
   }
 };
 
@@ -145,7 +145,7 @@ export const downloadData = (index, expiry, data) => async (dispatch) => {
   let response = "";
   console.log(index, data);
   try {
-    response = await API.post(`/api/analyze/download/${index}`, data, {
+    response = await API.post(`${constants.DOWNLOAD_DATA_API}/${index}`, data, {
       params: {
         expiry,
       },
@@ -157,7 +157,7 @@ export const downloadData = (index, expiry, data) => async (dispatch) => {
       payload: { data: response },
     });
   } catch (err) {
-    onError(dispatch,err)
+    onError(dispatch, err)
   }
 };
 
@@ -171,7 +171,7 @@ export const setFormValues = (formValues) => {
 export const getUptrend = () => async (dispatch) => {
   let response = "";
   try {
-    response = await API.get(`/api/analyze/uptrend`);
+    response = await API.get(`${constants.GET_UPTREND_API}`);
     response = response.data;
     console.log(response);
     dispatch({
@@ -179,7 +179,7 @@ export const getUptrend = () => async (dispatch) => {
       payload: response,
     });
   } catch (err) {
-    onError(dispatch,err)
+    onError(dispatch, err)
   }
 };
 
@@ -217,8 +217,8 @@ function IsJsonString(str) {
 export const getOptionValues = (expiry) => async (dispatch) => {
   let response = "";
   try {
-    let contentLength = await API.get(`/api/analyze/getContentLength`);
-    response = await API.get(`/api/analyze/options`, {
+    let contentLength = await API.get(`${constants.GET_CONTENT_LENGTH_API}`);
+    response = await API.get(`${constants.GET_OPTION_VALUES_API}`, {
       params: {
         expiry
       },
@@ -255,7 +255,7 @@ export const getOptionValues = (expiry) => async (dispatch) => {
     });
     console.log("Final over");
   } catch (err) {
-    onError(dispatch,err)
+    onError(dispatch, err)
   }
 };
 
@@ -300,7 +300,7 @@ export const resetTicker = () => {
 export const getExpiryDates = () => async (dispatch) => {
   let response = ''
   try {
-    response = await API.get("/api/nse/getOptionExpiries");
+    response = await API.get(`${constants.GET_EXPIRY_DATES_API}`);
     console.log(response.data);
     response = response.data;
     dispatch({
@@ -308,14 +308,14 @@ export const getExpiryDates = () => async (dispatch) => {
       payload: { data: response }
     })
   } catch (err) {
-    onError(dispatch,err)
+    onError(dispatch, err)
   }
 }
 
 export const getOptionRank = () => async (dispatch) => {
   let response = "";
   try {
-    response = await API.get(`/api/analyze/getOptionRank`);
+    response = await API.get(`${constants.GET_OPTION_RANK_API}`);
     response = response.data;
     console.log(response);
     dispatch({
@@ -324,7 +324,7 @@ export const getOptionRank = () => async (dispatch) => {
     })
   } catch (err) {
     console.log(err)
-    onError(dispatch,err)
+    onError(dispatch, err)
   }
   // this.getOptionValues()
 }
@@ -339,17 +339,17 @@ export const selectExpiry = (expiry) => {
 export const signIn = (credentials) => async (dispatch) => {
   let response = "";
   try {
-    response = await API.post("/api/login", {
+    response = await API.post(`${constants.SIGN_IN_API}`, {
       username: credentials.username,
       password: credentials.password
     });
     console.log(response.data)
     const accessToken = response.data.access_token
     //get user details from user api
-    const {username,is_admin} = jwtDecode(accessToken)
-    const payload={
+    const { username, is_admin } = jwtDecode(accessToken)
+    const payload = {
       username,
-      isAdmin:is_admin
+      isAdmin: is_admin
     }
     dispatch({
       type: SIGN_IN,
@@ -358,14 +358,14 @@ export const signIn = (credentials) => async (dispatch) => {
     history.push('/')
   }
   catch (err) {
-    onError(dispatch,err)
+    onError(dispatch, err)
   }
 }
 
 export const signOut = () => async (dispatch) => {
   let response = ""
   try {
-    response = await API.post("/api/logout");
+    response = await API.post(`${constants.SIGN_OUT_API}`);
     console.log(response)
     dispatch({
       type: SIGN_OUT,
@@ -379,11 +379,11 @@ export const signOut = () => async (dispatch) => {
 
 export const getSectors = () => async (dispatch) => {
   try {
-    const response = await API.get("/api/analyze/getSectors")
+    const response = await API.get(`${constants.GET_SECTORS_API}`)
     console.log(response)
     dispatch({
       type: GET_SECTORS,
-      payload: {data:response.data}
+      payload: { data: response.data }
     })
   }
   catch (err) {

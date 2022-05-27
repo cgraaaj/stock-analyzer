@@ -2,7 +2,7 @@ import sys
 import os
 
 from configparser import ConfigParser
-from nse.nse import get_nse_response, equities_url, option_chain_url,new_nse_url
+from nse.nse import get_nse_response, equities_url, option_chain_url, new_nse_url
 from multiprocessing import Pool
 import multiprocessing
 from itertools import repeat
@@ -12,22 +12,23 @@ from analyze import get_db
 from datetime import datetime
 from urllib.parse import quote
 
+
 class OptionTrend:
     def __init__(self):
         currDir = os.path.dirname(os.path.abspath(__file__))
-        self.configFile = os.path.join(currDir, 'config.cfg')
+        self.configFile = os.path.join(currDir, "config.cfg")
         self.result = multiprocessing.Manager().list()
         self.analyzing = True
         self.config = ConfigParser()
         self.config.read(self.configFile)
-        self.session = self.config.get('DEFAULT','sessionCounter')
+        self.session = self.config.get("DEFAULT", "sessionCounter")
 
     def analyze_options_data(self, index, symbol):
         url = option_chain_url.format(index, quote(symbol))
         try:
             temp = {}
-            resp = get_nse_response(new_nse_url,url)
-            temp["ltp"] = resp["records"]['underlyingValue']
+            resp = get_nse_response(new_nse_url, url)
+            temp["ltp"] = resp["records"]["underlyingValue"]
             resp = analyze_stock(resp["records"]["expiryDates"][0], resp["records"])
             # pprint(resp)
             temp["name"] = symbol
@@ -70,25 +71,31 @@ class OptionTrend:
         tickers = (
             ["NIFTY", "BANKNIFTY", "FINNIFTY"]
             if mode == "indices"
-            else get_nse_response(new_nse_url,equities_url)
+            else get_nse_response(new_nse_url, equities_url)
         )
 
         pool = Pool(2)
         pool.starmap(self.analyze_options_data, zip(repeat(mode), tickers[:100]))
         pool.close()
         pool.join()
-    
+
     def save(self):
         top5_call = [
             ticker
             for ticker in sorted(
-                self.result, key=lambda ticker: ticker["options"]["calls"]["bullish"] - ticker["options"]["calls"]["bearish"], reverse=True
+                self.result,
+                key=lambda ticker: ticker["options"]["calls"]["bullish"]
+                - ticker["options"]["calls"]["bearish"],
+                reverse=True,
             )
         ][:5]
         top5_put = [
             ticker
             for ticker in sorted(
-                self.result, key=lambda ticker: ticker["options"]["puts"]["bullish"] - ticker["options"]["puts"]["bearish"], reverse=True
+                self.result,
+                key=lambda ticker: ticker["options"]["puts"]["bullish"]
+                - ticker["options"]["puts"]["bearish"],
+                reverse=True,
             )
         ][:5]
 
@@ -109,7 +116,7 @@ class OptionTrend:
             data["sessions"] = sessions
             data["last_modified"] = datetime.utcnow()
             collection.insert_one(data)
-            
+
         else:
             currData = res[0]
             sessions = currData["sessions"]
@@ -118,11 +125,14 @@ class OptionTrend:
             sessionData["options"] = {"call": top5_call, "put": top5_put}
             sessionData["time"] = datetime.utcnow()
             sessions.append(sessionData)
-            last_modified= datetime.utcnow()
-            collection.update_one({"date": date}, {"$set": {"sessions": sessions,"last_modified": last_modified}})
+            last_modified = datetime.utcnow()
+            collection.update_one(
+                {"date": date},
+                {"$set": {"sessions": sessions, "last_modified": last_modified}},
+            )
 
-        self.config.set('DEFAULT', 'sessionCounter', str(int(self.session)+1))
-        with open(self.configFile, 'w') as cfg:
+        self.config.set("DEFAULT", "sessionCounter", str(int(self.session) + 1))
+        with open(self.configFile, "w") as cfg:
             self.config.write(cfg)
 
     def get_result(self):

@@ -56,7 +56,7 @@ class OptionUptrend extends React.Component {
       const values = {
         mode: this.props.selectedTicker.mode,
         index: this.props.selectedTicker.index,
-        expiry: this.props.user.isFetchManual ? this.props.expiryDates[1] : this.props.this.props.selectedExpiry,
+        expiry: this.props.user.isFetchManual ? this.props.expiryDates[1] : this.props.selectedExpiry,
       };
       this.props.analyzeOptionChain({ ...values, data: this.props.data });
       this.props.getOptionChain(values.expiry, this.props.data);

@@ -30,75 +30,96 @@ from flask_jwt_extended import jwt_required
 
 analyze = Blueprint("analyze", __name__)
 db = get_database()
-currpath= os.path.dirname(os.path.abspath(__file__))
+currpath = os.path.dirname(os.path.abspath(__file__))
 
-nifty_auto = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxAuto"))['data']]
-nifty_bank = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("bankNifty"))['data']]
-nifty_energy = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxEnergy"))['data']]
-nifty_finance = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxFinance"))['data']]
-nifty_fmcg = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxFMCG"))['data']]
-nifty_it = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxit"))['data']]
-nifty_media = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxMedia"))['data']]
-nifty_metal = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxMetal"))['data']]
-nifty_pharma = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxPharma"))['data']]
-nifty_psu = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxPSU"))['data']]
-nifty_realty = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("cnxRealty"))['data']]
-nifty_pvt_bank = [stock['symbol'] for stock in nse.get_nse_response(nse.new_nse_url,nse.sector_url.format("niftyPvtBank"))['data']]
+nifty_auto = [
+    stock["symbol"]
+    for stock in nse.get_nse_response(
+        nse.new_nse_url, nse.sector_url.format("cnxAuto")
+    )["data"]
+]
+nifty_bank = [
+    stock["symbol"]
+    for stock in nse.get_nse_response(
+        nse.new_nse_url, nse.sector_url.format("bankNifty")
+    )["data"]
+]
+nifty_energy = [
+    stock["symbol"]
+    for stock in nse.get_nse_response(
+        nse.new_nse_url, nse.sector_url.format("cnxEnergy")
+    )["data"]
+]
+nifty_finance = [
+    stock["symbol"]
+    for stock in nse.get_nse_response(
+        nse.new_nse_url, nse.sector_url.format("cnxFinance")
+    )["data"]
+]
+nifty_fmcg = [
+    stock["symbol"]
+    for stock in nse.get_nse_response(
+        nse.new_nse_url, nse.sector_url.format("cnxFMCG")
+    )["data"]
+]
+nifty_it = [
+    stock["symbol"]
+    for stock in nse.get_nse_response(nse.new_nse_url, nse.sector_url.format("cnxit"))[
+        "data"
+    ]
+]
+nifty_media = [
+    stock["symbol"]
+    for stock in nse.get_nse_response(
+        nse.new_nse_url, nse.sector_url.format("cnxMedia")
+    )["data"]
+]
+nifty_metal = [
+    stock["symbol"]
+    for stock in nse.get_nse_response(
+        nse.new_nse_url, nse.sector_url.format("cnxMetal")
+    )["data"]
+]
+nifty_pharma = [
+    stock["symbol"]
+    for stock in nse.get_nse_response(
+        nse.new_nse_url, nse.sector_url.format("cnxPharma")
+    )["data"]
+]
+nifty_psu = [
+    stock["symbol"]
+    for stock in nse.get_nse_response(nse.new_nse_url, nse.sector_url.format("cnxPSU"))[
+        "data"
+    ]
+]
+nifty_realty = [
+    stock["symbol"]
+    for stock in nse.get_nse_response(
+        nse.new_nse_url, nse.sector_url.format("cnxRealty")
+    )["data"]
+]
+nifty_pvt_bank = [
+    stock["symbol"]
+    for stock in nse.get_nse_response(
+        nse.new_nse_url, nse.sector_url.format("niftyPvtBank")
+    )["data"]
+]
 
 sectors = [
-        {
-            "label": "Nifty Auto",
-            "value": nifty_auto
-        },
-        {
-            "label": "Nifty Bank",
-            "value": nifty_bank
-        },
-        {
-            "label": "Nifty Energy",
-            "value": nifty_energy
-        },
-        {
-            "label": "Nifty Financial Services",
-            "value": nifty_finance
-        },
-        {
-            "label": "Nifty FMCG",
-            "value": nifty_fmcg
-        },
-        {
-            "label": "Nifty IT",
-            "value": nifty_it
-        },
-        {
-            "label": "Nifty Media",
-            "value": nifty_media
-        },
-        {
-            "label": "Nifty Metal",
-            "value": nifty_metal
-        },
-        {
-            "label": "Nifty Pharma",
-            "value": nifty_pharma
-        },
-        {
-            "label": "Nifty PSU Bank",
-            "value": nifty_psu
-        },
-        {
-            "label": "Nifty Realty",
-            "value": nifty_realty
-        },
-        {
-            "label": "Nifty Private Bank",
-            "value": nifty_pvt_bank
-        },
-        {
-            "label": "",
-            "value": []
-        }
-    ]
+    {"label": "Nifty Auto", "value": nifty_auto},
+    {"label": "Nifty Bank", "value": nifty_bank},
+    {"label": "Nifty Energy", "value": nifty_energy},
+    {"label": "Nifty Financial Services", "value": nifty_finance},
+    {"label": "Nifty FMCG", "value": nifty_fmcg},
+    {"label": "Nifty IT", "value": nifty_it},
+    {"label": "Nifty Media", "value": nifty_media},
+    {"label": "Nifty Metal", "value": nifty_metal},
+    {"label": "Nifty Pharma", "value": nifty_pharma},
+    {"label": "Nifty PSU Bank", "value": nifty_psu},
+    {"label": "Nifty Realty", "value": nifty_realty},
+    {"label": "Nifty Private Bank", "value": nifty_pvt_bank},
+    {"label": "", "value": []},
+]
 
 
 @analyze.route("/option-chain", methods=["POST"])
@@ -108,7 +129,7 @@ def option_chain():
     expiry = request.args.get("expiry")
     current_app.logger.info(f"analyzing data")
     df = analyze_stock(expiry, request.json)
-    return df.to_json(orient='records')
+    return df.to_json(orient="records")
 
 
 @analyze.route("/download/<path:index>", methods=["POST"])
@@ -164,7 +185,7 @@ def get_options():
     tickers = (
         ["NIFTY", "BANKNIFTY", "FINNIFTY"]
         if mode == "indices"
-        else get_nse_response(nse.new_nse_url,nse.equities_url)
+        else get_nse_response(nse.new_nse_url, nse.equities_url)
     )
 
     def generate():
@@ -176,10 +197,11 @@ def get_options():
     return current_app.response_class(generate(), mimetype="application/json")
     # return current_app.response_class(stream_with_context(generate()))
 
+
 @analyze.route("/getOptionRank", methods=["GET"])
 @jwt_required()
 def get_option_rank():
-    sessions={'5min':[],'15min':[],'30min':[],'60min':[]}
+    sessions = {"5min": [], "15min": [], "30min": [], "60min": []}
     current_app.logger.info(f"fetching data")
     collection = db["rankOptions"]
     res = list(
@@ -194,62 +216,93 @@ def get_option_rank():
     # sessions['15min'] = res['sessions'][3:len(res['sessions']):3]
     # sessions['30min'] = res['sessions'][6:len(res['sessions']):6]
     # sessions['60min'] = res['sessions'][6:len(res['sessions']):12]
-    sessions['5min'] = []
-    sessions['15min'] = []
-    sessions['30min'] = res['sessions']
-    sessions['60min'] = res['sessions'][1:len(res['sessions']):2]
+    sessions["5min"] = []
+    sessions["15min"] = []
+    sessions["30min"] = res["sessions"]
+    sessions["60min"] = res["sessions"][1 : len(res["sessions"]) : 2]
     # current_app.logger.info(sessions)
-    return jsonify({"date":res['date'],"sessions":sessions})
+    return jsonify({"date": res["date"], "sessions": sessions})
+
 
 @analyze.route("/getSectors", methods=["GET"])
 @jwt_required()
 def get_sectors():
-    return ({"sectors":sectors})
+    return {"sectors": sectors}
 
 
 def analyze_options_data(index, symbol, expiry):
     url = nse.option_chain_url.format(index, quote(symbol))
-    resp={}
+    resp = {}
     try:
-        resp = get_nse_response(nse.new_nse_url,url)
+        resp = get_nse_response(nse.new_nse_url, url)
         resp = analyze_stock(expiry, resp["records"])
         # pprint(resp)
         temp = {}
         temp["name"] = symbol
         temp["options"] = {
-            "calls": {"bullish": 0, "bearish": 0, "percentage":0, "grade":""},
-            "puts": {"bullish": 0, "bearish": 0,"percentage":0, "grade":""},
+            "calls": {"bullish": 0, "bearish": 0, "percentage": 0, "grade": ""},
+            "puts": {"bullish": 0, "bearish": 0, "percentage": 0, "grade": ""},
         }
 
         temp["options"]["calls"]["bullish"] = len(resp[resp["Call Trend"] == "Bullish"])
         temp["options"]["calls"]["bearish"] = len(resp[resp["Call Trend"] == "Bearish"])
-        if(temp["options"]["calls"]["bullish"]==0):
+        if temp["options"]["calls"]["bullish"] == 0:
             temp["options"]["calls"]["percentage"] = 0
         else:
-            temp["options"]["calls"]["percentage"] = math.ceil(((temp["options"]["calls"]["bullish"] - temp["options"]["calls"]["bearish"])/temp["options"]["calls"]["bullish"])*100)
-        if(temp["options"]["calls"]["percentage"]==100):
-            temp["options"]["calls"]["grade"] ="A"
-        elif(temp["options"]["calls"]["percentage"]>85 and temp["options"]["calls"]["percentage"]<100):
-            temp["options"]["calls"]["grade"] ="B"
-        elif(temp["options"]["calls"]["percentage"]>50 and temp["options"]["calls"]["percentage"]<=85):
-            temp["options"]["calls"]["grade"] ="C"
+            temp["options"]["calls"]["percentage"] = math.ceil(
+                (
+                    (
+                        temp["options"]["calls"]["bullish"]
+                        - temp["options"]["calls"]["bearish"]
+                    )
+                    / temp["options"]["calls"]["bullish"]
+                )
+                * 100
+            )
+        if temp["options"]["calls"]["percentage"] == 100:
+            temp["options"]["calls"]["grade"] = "A"
+        elif (
+            temp["options"]["calls"]["percentage"] > 85
+            and temp["options"]["calls"]["percentage"] < 100
+        ):
+            temp["options"]["calls"]["grade"] = "B"
+        elif (
+            temp["options"]["calls"]["percentage"] > 50
+            and temp["options"]["calls"]["percentage"] <= 85
+        ):
+            temp["options"]["calls"]["grade"] = "C"
         else:
-            temp["options"]["calls"]["grade"] ="D"
-        
+            temp["options"]["calls"]["grade"] = "D"
+
         temp["options"]["puts"]["bullish"] = len(resp[resp["Put Trend"] == "Bullish"])
         temp["options"]["puts"]["bearish"] = len(resp[resp["Put Trend"] == "Bearish"])
-        if(temp["options"]["puts"]["bullish"] == 0):
+        if temp["options"]["puts"]["bullish"] == 0:
             temp["options"]["puts"]["percentage"] = 0
         else:
-            temp["options"]["puts"]["percentage"] = math.ceil(((temp["options"]["puts"]["bullish"] - temp["options"]["puts"]["bearish"])/temp["options"]["puts"]["bullish"])*100)
-        if(temp["options"]["puts"]["percentage"]==100):
-            temp["options"]["puts"]["grade"] ="A"
-        elif( temp["options"]["puts"]["percentage"]>85 and temp["options"]["puts"]["percentage"]<100):
-            temp["options"]["puts"]["grade"] ="B"
-        elif(temp["options"]["puts"]["percentage"]>50 and temp["options"]["puts"]["percentage"]<=85):
-            temp["options"]["puts"]["grade"] ="C"
+            temp["options"]["puts"]["percentage"] = math.ceil(
+                (
+                    (
+                        temp["options"]["puts"]["bullish"]
+                        - temp["options"]["puts"]["bearish"]
+                    )
+                    / temp["options"]["puts"]["bullish"]
+                )
+                * 100
+            )
+        if temp["options"]["puts"]["percentage"] == 100:
+            temp["options"]["puts"]["grade"] = "A"
+        elif (
+            temp["options"]["puts"]["percentage"] > 85
+            and temp["options"]["puts"]["percentage"] < 100
+        ):
+            temp["options"]["puts"]["grade"] = "B"
+        elif (
+            temp["options"]["puts"]["percentage"] > 50
+            and temp["options"]["puts"]["percentage"] <= 85
+        ):
+            temp["options"]["puts"]["grade"] = "C"
         else:
-            temp["options"]["puts"]["grade"] ="D"
+            temp["options"]["puts"]["grade"] = "D"
 
         temp["callTrend"] = (
             True
@@ -265,6 +318,7 @@ def analyze_options_data(index, symbol, expiry):
     except Exception as e:
         # current_app.logger.info(symbol)
         print(f"got Exception {e} on {symbol}")
+
 
 def analyze_option_trend():
     optionTrend = rankOptions.OptionTrend()

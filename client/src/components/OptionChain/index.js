@@ -46,7 +46,7 @@ class OptionChain extends React.Component {
     sessionStorage.setItem("tableData", JSON.stringify(OCTableData));
     // let subDomain = /:\/\/([^\/]+)/.exec(window.location.href)[0];
     // console.log(window.location.pathname)
-    window.open(`/stock-analyzer/option_chain_table`, "_blank");
+    window.open(`/option_chain_table`, "_blank");
   };
 
   onClickChart = (data) => (e) => {

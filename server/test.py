@@ -40,16 +40,18 @@ app.config["CORS_HEADERS"] = "Content-Type"
 def hi():
     return "hi"
 
-@app.route('/test.csv')
+
+@app.route("/test.csv")
 def generate_large_csv():
     def generate():
-        filename = 'test.csv'
-        with open(filename, 'r') as csvfile:
+        filename = "test.csv"
+        with open(filename, "r") as csvfile:
             datareader = csv.reader(csvfile)
             for row in datareader:
                 time.sleep(1)
                 yield f"{','.join(row)}\n"
-    return app.response_class(generate(), mimetype='text/csv')
+
+    return app.response_class(generate(), mimetype="text/csv")
 
 
 # main driver function

@@ -9,23 +9,25 @@ import pathlib
 
 cwd = pathlib.Path(__file__).parent.resolve()
 
-logging.basicConfig(filename=f'{cwd}/ws.log',
-                            filemode='a',
-                            format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                            datefmt='%H:%M:%S',
-                            level=logging.INFO)
+logging.basicConfig(
+    filename=f"{cwd}/ws.log",
+    filemode="a",
+    format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
+    datefmt="%H:%M:%S",
+    level=logging.INFO,
+)
 
 
 class OptionTrendTimer:
     def __init__(self, ws):
         self.ws = ws
         self.start = datetime.now().replace(hour=9, minute=15)
-        self.end = datetime.now().replace(hour=15, minute=30)
+        self.end = datetime.now().replace(hour=21, minute=30)
 
     async def get_option_trend(self, ot):
         minutes = 5
         while True:
-            while datetime.now() > self.start and datetime.now()< self.end:
+            while datetime.now() > self.start and datetime.now() < self.end:
                 logging.info(f"Starting Trend analysis")
                 before = timeit.default_timer()
                 result = await ot.get_option_trend("equities")
@@ -39,26 +41,24 @@ class OptionTrendTimer:
                 await self.ws.send_to_clients("trend", json.dumps(trend_data))
                 ot.save_to_db()
                 ot.clear_option_trend()
-                ot.result['options_trend'] = trend_data
+                ot.result["options_trend"] = trend_data
                 self.ws.set_last_updated(ot.get_result())
                 await asyncio.sleep(minutes * 60)
-            await asyncio.sleep((self.start-datetime.now()).total_seconds())
+            await asyncio.sleep((self.start - datetime.now()).total_seconds())
 
     async def get_option_rank(self, ot):
         minutes = 5
         while True:
-            while datetime.now()> self.start and datetime.now()< self.end:
+            while datetime.now() > self.start and datetime.now() < self.end:
                 await asyncio.sleep(40)
                 logging.info(f"Starting Rank analysis")
                 result = await ot.get_option_rank()
                 rank_data = {"data": result, "event": "RANK"}
-                await self.ws.send_to_clients(
-                    "rank", json.dumps(rank_data)
-                )
-                ot.result['options_rank'] = rank_data
+                await self.ws.send_to_clients("rank", json.dumps(rank_data))
+                ot.result["options_rank"] = rank_data
                 self.ws.set_last_updated(ot.get_result())
-                await asyncio.sleep((minutes * 60)-40)
-            await asyncio.sleep((self.start-datetime.now()).total_seconds())
+                await asyncio.sleep((minutes * 60) - 40)
+            await asyncio.sleep((self.start - datetime.now()).total_seconds())
 
 
 class WebsocketServer:

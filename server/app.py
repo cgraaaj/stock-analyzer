@@ -55,7 +55,7 @@ logging.basicConfig(
 )
 
 # cors
-cors = CORS(app)
+CORS(app)
 app.config["CORS_HEADERS"] = "Content-Type"
 
 db = get_database()
@@ -79,9 +79,6 @@ def refresh_expiring_jwts(response):
         # Case where there is not a valid JWT. Just return the original respone
         return response
 
-# The route() function of the Flask class is a decorator,
-# which tells the application which URL should call
-# the associated function.
 @app.route("/hi", methods=["GET"])
 def hi():
     return "hi"

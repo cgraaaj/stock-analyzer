@@ -31,7 +31,7 @@ class Header extends React.Component {
           </NavLink>
           <div className="right menu">
             <div className="item">
-              <text>{`Hey, ${this.props.user.username}`}</text>
+              {`${this.props.user.username}`}
             </div>
             <div className="item">
               <button className="ui button" onClick={() => {

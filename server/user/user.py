@@ -10,7 +10,6 @@ db = get_database()
 collection = db["users"]
 
 
-
 @user.route("/getUsers", methods=["GET"])
 @jwt_required()
 def get_all_users():
@@ -32,6 +31,7 @@ def get_all_users():
     )
     current_app.logger.info(users)
     return jsonify({"users": users})
+
 
 @user.route("/getUser/<public_id>", methods=["GET"])
 @jwt_required()

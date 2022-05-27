@@ -50,16 +50,16 @@ class OptionTrend:
                 result["options"][_type]["bearish"] = len(
                     resp[resp["Call Trend"] == "Bearish"]
                 )
-                if result["options"][_type]["bullish"]==0:
-                    result["options"][_type]["percentage"]=0
+                if result["options"][_type]["bullish"] == 0:
+                    result["options"][_type]["percentage"] = 0
                 else:
                     result["options"][_type]["percentage"] = (
-                    (
-                        result["options"][_type]["bullish"]
-                        - result["options"][_type]["bearish"]
-                    )
-                    / result["options"][_type]["bullish"]
-                ) * 100
+                        (
+                            result["options"][_type]["bullish"]
+                            - result["options"][_type]["bearish"]
+                        )
+                        / result["options"][_type]["bullish"]
+                    ) * 100
 
                 if result["options"][_type]["percentage"] == 100:
                     result["options"][_type]["grade"] = "A"
